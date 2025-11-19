@@ -28,7 +28,7 @@ const SignIn: React.FC = () => {
     try {
       await login(email, password);
     } catch (error) {
-      alert("Invalid email or password");
+      alert(`Login failed ${(error as Error).message}`);
     } finally {
       setLoading(false);
     }
@@ -36,7 +36,7 @@ const SignIn: React.FC = () => {
 
   useEffect(() => {
     if (userContextId) {
-      router.push("/Home");
+      router.push("/Home"); // points to (protected)/page.tsx
     }
   }, [userContextId, router]);
 
@@ -75,7 +75,7 @@ const SignIn: React.FC = () => {
         </form>
 
         <p className="text-sm text-center mt-3">
-          Don't have an account?{" "}
+          Do not have an account?{" "}
           <Link
             href="/SignUp"
             className="text-primary font-medium hover:underline"

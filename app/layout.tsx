@@ -1,3 +1,4 @@
+"use client";
 import { UserProvider } from "./context/AuthContext";
 import { ProjectProvider } from "./context/projectContext";
 import "./globals.css";

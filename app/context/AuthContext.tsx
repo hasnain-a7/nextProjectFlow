@@ -85,8 +85,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       await setDoc(userRef, userData);
       console.log("✅ User registered & Firestore profile created!");
-    } catch (error: any) {
-      console.error("❌ Signup error:", error.message);
+    } catch (error) {
+      console.error("❌ Signup error:", (error as Error).message);
       throw error;
     }
   };
@@ -95,8 +95,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("✅ User logged in!");
-    } catch (error: any) {
-      console.error("❌ Login error:", error.message);
+    } catch (error) {
+      console.error("❌ Login error:", (error as Error).message);
       throw error;
     }
   };
@@ -106,8 +106,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       await signOut(auth);
       setUserId(null);
       console.log("🚪 User logged out!");
-    } catch (error: any) {
-      console.error("❌ Logout error:", error.message);
+    } catch (error) {
+      console.error("❌ Logout error:", (error as Error).message);
       throw error;
     }
   };
@@ -123,8 +123,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("🗑️ Firestore user document deleted");
       await deleteUser(user);
       console.log("✅ Firebase Auth account deleted successfully!");
-    } catch (error: any) {
-      console.error("❌ Error deleting account:", error.message);
+    } catch (error) {
+      console.error("❌ Error deleting account:", (error as Error).message);
     }
   };
 
@@ -136,8 +136,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       await updatePassword(user, newPassword);
       console.log("✅ Password updated successfully!");
       return true;
-    } catch (error: any) {
-      console.error("❌ Error updating password:", error.message);
+    } catch (error) {
+      console.error("❌ Error updating password:", (error as Error).message);
       throw error;
     }
   };

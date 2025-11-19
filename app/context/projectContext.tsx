@@ -16,20 +16,6 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
-export interface Task {
-  id?: string;
-  title: string;
-  todo: string;
-  createdAt: string;
-  updatedAt?: string;
-  status: string;
-  attachments?: string[];
-  dueDate?: string;
-  userId?: string | null;
-  projectId?: string;
-  todoEmoji?: string;
-}
-
 export interface User {
   id?: string;
   email: string;
@@ -44,7 +30,19 @@ export interface User {
   createdAt?: string;
   updatedAt?: string;
 }
-
+export interface Task {
+  id?: string;
+  title: string;
+  todo: string;
+  createdAt: string;
+  updatedAt?: string;
+  status: string;
+  attachments?: string[];
+  dueDate?: string;
+  userId?: string | null;
+  projectId?: string;
+  todoEmoji?: string;
+}
 export interface Project {
   id?: string;
   title: string;
@@ -138,8 +136,8 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({
       const userRef = doc(db, "users", userId);
       const userSnap = await getDocs(
         query(collection(db, "users"), where("id", "==", userId))
-      ); // Or getDoc if ID matches document ID
-
+      );
+      console.log(userSnap);
       const userDocSnap = await getDoc(userRef);
 
       if (userDocSnap.exists()) {

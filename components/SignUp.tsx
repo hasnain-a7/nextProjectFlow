@@ -40,16 +40,15 @@ const SignUp: React.FC = () => {
       await signUp(userData?.email || "", password, userData);
       console.log("✅ User signed up successfully!");
       navigate.push("/Home");
-    } catch (error: any) {
-      console.error("❌ Signup error:", error.message);
-      alert(error.message);
+    } catch (error) {
+      alert(`Sign up failed ${(error as Error).message}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card className="w-[90%] max-w-md mx-auto md:mt-10 border  shadow-xl backdrop-blur-sm bg-gradient-to-b ">
+    <Card className="w-[90%] max-w-md mx-auto md:mt-10 border  shadow-xl backdrop-blur-sm  ">
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-3xl font-semibold text-white">
           Create Account
