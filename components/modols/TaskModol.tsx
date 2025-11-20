@@ -20,8 +20,8 @@ import {
 import DatePicker from "../DatePicker";
 import { useParams } from "react-router-dom";
 import { Separator } from "../ui/separator";
-// import EmojiInput from "./EmojiInput";
 import Image from "next/image";
+import EmojiInput from "../EmojiInput";
 
 export interface TaskFormData {
   title: string;
@@ -165,12 +165,12 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
               />
 
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                {/* <EmojiInput
+                <EmojiInput
                   value={formData?.todoEmoji || ""}
                   onChange={(todoEmoji) =>
                     setFormData({ ...formData, todoEmoji })
                   }
-                /> */}
+                />
               </div>
             </div>
           </div>
@@ -224,11 +224,14 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
         <div className="flex flex-col h-full gap-4">
           <div className="bg-accent/25 rounded-lg p-4 flex flex-col items-center justify-center gap-4">
             {formData.attachments?.[0] ? (
-              <Image
-                src={formData.attachments[0]}
-                alt="Preview"
-                className="w-full h-52 object-cover shadow-sm"
-              />
+              <div className="relative w-full h-52 shadow-sm">
+                <Image
+                  src={formData.attachments[0]}
+                  alt="Preview"
+                  fill
+                  className="object-cover rounded"
+                />
+              </div>
             ) : (
               <div className="w-full h-52 flex items-center justify-center border border-dashed text-muted-foreground text-sm">
                 No image uploaded

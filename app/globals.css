@@ -120,3 +120,27 @@
     @apply bg-background text-foreground;
   }
 }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af var(--background);
+  scrollbar-width: 4px;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #9ca3af;
+  border-radius: 9999px;
+  border: 2px solid #f3f4f6;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}

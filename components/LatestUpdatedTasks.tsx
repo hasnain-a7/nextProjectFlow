@@ -3,10 +3,10 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { FaEdit } from "react-icons/fa";
+
 import TaskModol from "./modols/TaskModol";
 import { Badge } from "./ui/badge";
-import { Eye } from "lucide-react";
+import { Edit, Info } from "lucide-react";
 import TaskDetailModal from "./modols/TrelloModol";
 
 interface LatestTask {
@@ -69,8 +69,8 @@ const LatestUpdatedTasks: React.FC<LatestUpdatedTasksProps> = ({
                       <div className="flex gap-2">
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Eye
-                              size={20}
+                            <Info
+                              size={16}
                               onClick={(e) => {
                                 e.stopPropagation();
                               }}
@@ -83,7 +83,7 @@ const LatestUpdatedTasks: React.FC<LatestUpdatedTasksProps> = ({
 
                         <Dialog>
                           <DialogTrigger asChild>
-                            <FaEdit
+                            <Edit
                               size={16}
                               onClick={(e) => {
                                 e.stopPropagation();

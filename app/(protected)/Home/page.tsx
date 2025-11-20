@@ -1,7 +1,7 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useDeferredValue, lazy, Suspense } from "react";
 import { ProjectCard } from "@/components/ProjectCard";
-import { CheckCircle, Clock, FolderOpen, Search } from "lucide-react";
+import { CheckCircle, Clock, FolderOpen, Search, Plus } from "lucide-react";
 import { useProjectContext, Task } from "@/app/context/projectContext";
 import { useRouter } from "next/navigation";
 import { StatsCard } from "@/components/StatsCard";
@@ -13,12 +13,10 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"; // Added AnimatePresence
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import ProjectModol from "@/components/modols/ProjectModol";
-import { Plus } from "lucide-react";
 import Loader from "@/components/Loader";
 import { UpcomingDeadlines } from "@/components/UpCommingDeadline";
 import LatestProjects from "@/components/LatestProjects";
@@ -33,13 +31,37 @@ import {
 } from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
 
+// 1. LAZY LOAD: Only import the Modal when needed to save initial bundle size
+const ProjectModol = lazy(() => import("@/components/modols/ProjectModol"));
+
+// 2. ANIMATION VARIANTS: Define the staggered entrance
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1, // Delay between each child showing up
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } },
+  exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } },
+};
+
 const HomePage = () => {
   const { projects, loading } = useProjectContext();
   const navigate = useRouter();
 
-  const [filteredProject, setFilteredProject] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const deferredSearch = useDeferredValue(searchTerm);
+
   const [filter, setFilter] = useState<"all" | "recent" | "lastupdated">("all");
   const [filteredCategory, setFilteredCategory] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const LatestProject = useMemo(() => {
     if (!projects?.length) return null;
@@ -49,17 +71,14 @@ const HomePage = () => {
     )[0];
   }, [projects]);
 
-  // Projects with assigned users
   const AssignedProjects = useMemo(() => {
     return projects.filter((p) => p.assignedUsers?.length);
   }, [projects]);
 
-  // Total active projects
   const TotalActiveProjects = useMemo(() => {
     return projects.filter((p) => p.status === "active");
   }, [projects]);
 
-  // Last updated project
   const LastUpdatedProject = useMemo(() => {
     return [...projects]
       .filter((p) => p.updatedAt)
@@ -70,12 +89,12 @@ const HomePage = () => {
       )[0];
   }, [projects]);
 
-  // Filtered projects based on search, category, and dropdown
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
       const titleMatch = project.title
         .toLowerCase()
-        .includes(filteredProject.toLowerCase());
+        .includes(deferredSearch.toLowerCase());
+
       const categoryMatch = filteredCategory
         ? project.Category?.toLowerCase() === filteredCategory.toLowerCase()
         : true;
@@ -91,37 +110,32 @@ const HomePage = () => {
     });
   }, [
     projects,
-    filteredProject,
+    deferredSearch,
     filteredCategory,
     filter,
     LatestProject,
     LastUpdatedProject,
   ]);
 
-  // Unique categories
   const Categories = useMemo(() => {
     const unique = new Set<string>();
-    return projects.filter((p) => {
+    const result: any[] = [];
+    projects.forEach((p) => {
       if (p.Category && !unique.has(p.Category)) {
         unique.add(p.Category);
-        return true;
+        result.push(p);
       }
-      return false;
     });
+    return result;
   }, [projects]);
 
-  // Tasks summary using project.Tasks
   const { totalTasks, latestTasks } = useMemo(() => {
     let total = 0;
-    let active = 0;
-    let completed = 0;
     const allTasks: (Task & { projectId: string; projectTitle: string })[] = [];
 
     projects.forEach((project) => {
       const tasks = project.Tasks || [];
       total += tasks.length;
-      active += tasks.filter((t) => t.status === "active").length;
-      completed += tasks.filter((t) => t.status === "completed").length;
 
       tasks.forEach((task) => {
         if (task.updatedAt) {
@@ -144,29 +158,30 @@ const HomePage = () => {
 
     return {
       totalTasks: total,
-      totalActive: active,
-      totalCompleted: completed,
       latestTasks: sortedTasks,
     };
   }, [projects]);
 
-  const handleProjectClick = (id: string) => navigate.push(`/project/${id}`);
+  const handleProjectClick = (id: string) => navigate.push(`/projects/${id}`);
   const handleCategoryProject = (value: string) =>
     setFilteredCategory(value === "all" ? "" : value);
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const projectsPerPage = 6;
-  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
-  const sortedProjects = [...filteredProjects].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
-  const indexOfLastProject = currentPage * projectsPerPage;
-  const indexOfFirstProject = indexOfLastProject - projectsPerPage;
-  const currentProjects = sortedProjects.slice(
-    indexOfFirstProject,
-    indexOfLastProject
-  );
+  const { currentProjects, totalPages } = useMemo(() => {
+    const projectsPerPage = 6;
+    const total = Math.ceil(filteredProjects.length / projectsPerPage);
+
+    const sorted = [...filteredProjects].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    const indexOfLastProject = currentPage * projectsPerPage;
+    const indexOfFirstProject = indexOfLastProject - projectsPerPage;
+    const current = sorted.slice(indexOfFirstProject, indexOfLastProject);
+
+    return { currentProjects: current, totalPages: total };
+  }, [filteredProjects, currentPage]);
+
   const handleFilterChange = (value: string) => {
     if (value === "all" || value === "recent" || value === "lastupdated") {
       setFilter(value);
@@ -180,9 +195,15 @@ const HomePage = () => {
           <Loader />
         </div>
       ) : (
-        <div className="h-full  p-1 bg-background md:p-1 ">
+        <div className="h-full p-1 bg-background md:p-1 md:overflow-hidden ">
           <main className="w-full mx-auto pt-1 flex-1 ">
-            <section className="mb-1">
+            {/* Stats Section with simple fade in */}
+            <motion.section
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-1"
+            >
               <div className="grid px-0.5 py-0.5 auto-rows-min gap-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
                 <StatsCard
                   title="Projects"
@@ -209,7 +230,7 @@ const HomePage = () => {
                   color="bg-gradient-to-br from-teal-500 to-teal-600"
                 />
               </div>
-            </section>
+            </motion.section>
 
             <section className="flex flex-col lg:flex-row h-full w-full gap-2">
               <div className="flex-1 min-w-0">
@@ -223,8 +244,8 @@ const HomePage = () => {
                       <Input
                         type="text"
                         placeholder="Search..."
-                        value={filteredProject}
-                        onChange={(e) => setFilteredProject(e.target.value)}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10 pr-8 py-1 text-sm  "
                       />
                     </div>
@@ -278,7 +299,16 @@ const HomePage = () => {
                             <span className=" md:hidden">Project</span>
                           </Button>
                         </DialogTrigger>
-                        <ProjectModol />
+                        {/* LAZY LOAD: Wrapped in Suspense */}
+                        <Suspense
+                          fallback={
+                            <div className="p-4">
+                              <Loader />
+                            </div>
+                          }
+                        >
+                          <ProjectModol />
+                        </Suspense>
                       </Dialog>
                       <Card className="hidden md:block md:bg-blend-hard-light p-0 rounded-lg sticky bottom-4 left-0 right-0 mx-auto w-fit z-40">
                         <Pagination>
@@ -320,37 +350,47 @@ const HomePage = () => {
                     </div>
                   </div>
                   <Separator />
-                  <div className="w-full min-h-[340px] md:min-h-[500px] lg:min-h-[340px] xl:h-full rounded-lg grid gap-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                    {currentProjects.length > 0 ? (
-                      currentProjects.map((project, index) => (
-                        <motion.div
-                          key={project.id}
-                          className="w-full h-full"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            duration: 0.4,
-                            delay: index * 0.07,
-                            ease: "easeOut",
-                          }}
-                          whileHover={{
-                            scale: 1.02,
-                            transition: { duration: 0.2 },
-                          }}
+
+                  <motion.div
+                    className="w-full min-h-[340px] md:min-h-[500px] lg:min-h-[340px] xl:h-full rounded-lg grid gap-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="show"
+                  >
+                    <AnimatePresence mode="popLayout">
+                      {currentProjects.length > 0 ? (
+                        currentProjects.map((project) => (
+                          <motion.div
+                            key={project.id}
+                            layout
+                            variants={itemVariants}
+                            initial="hidden"
+                            animate="show"
+                            exit="exit"
+                            className="w-full h-full"
+                            whileHover={{
+                              scale: 1.02,
+                              transition: { duration: 0.2 },
+                            }}
+                          >
+                            <ProjectCard
+                              projectToShow={project}
+                              tasks={project.Tasks || []}
+                              onClick={handleProjectClick}
+                            />
+                          </motion.div>
+                        ))
+                      ) : (
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="text-muted-foreground text-center col-span-full pt-12"
                         >
-                          <ProjectCard
-                            projectToShow={project}
-                            tasks={project.Tasks || []}
-                            onClick={handleProjectClick}
-                          />
-                        </motion.div>
-                      ))
-                    ) : (
-                      <p className="text-muted-foreground text-center col-span-full pt-12">
-                        No projects found. Add new projects to get started.
-                      </p>
-                    )}
-                  </div>
+                          No projects found. Add new projects to get started.
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
 
                   {totalPages > 1 && (
                     <Pagination className="-mt-1 md:hidden lg:hidden xl:hidden">
@@ -400,7 +440,10 @@ const HomePage = () => {
                 </div>
               </div>
 
-              <div
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
                 className="flex min-h-[340px] flex-col gap-2 mt-2 
                 lg:flex-col lg:w-[40%] xl:w-[45%]"
               >
@@ -426,11 +469,8 @@ const HomePage = () => {
                     <LatestUpdatedTasks latestTasks={latestTasks} />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </section>
-            {/* <section className="-mt-2">
-              <ProjectsBoard />
-            </section> */}
           </main>
         </div>
       )}

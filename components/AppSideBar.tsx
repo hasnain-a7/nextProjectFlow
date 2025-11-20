@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic"; // OPTIMIZATION: For lazy loading
 import { usePathname } from "next/navigation";
 import { IoHomeOutline } from "react-icons/io5";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -9,7 +10,11 @@ import { Separator } from "./ui/separator";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Bot, FolderOpen, CalendarRange } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
-import ProjectModol from "./modols/ProjectModol";
+// OPTIMIZATION: Lazy load the modal so it doesn't slow down initial render
+const ProjectModol = dynamic(() => import("./modols/ProjectModol"), {
+  ssr: false,
+});
+
 import {
   Sidebar,
   SidebarContent,
@@ -33,18 +38,39 @@ export default function AppSidebar({
   const { projects, loading } = useProjectContext();
   const { setOpen, state } = useSidebar();
   const [hovered, setHovered] = React.useState(false);
-  const pathname = usePathname(); // Next.js path
+  const pathname = usePathname();
 
-  const items = [
-    { title: "Home", url: "/Home", icon: IoHomeOutline },
-    { title: "Projects", url: "/assign-projects", icon: FolderOpen },
-    { title: "Ai Talk", url: "/ai-talk", icon: Bot },
-    {
-      title: "Schedule Projects",
-      url: "/calender-projects",
-      icon: CalendarRange,
-    },
-  ];
+  const [isPending, startTransition] = React.useTransition();
+
+  const items = React.useMemo(
+    () => [
+      { title: "Home", url: "/Home", icon: IoHomeOutline },
+      { title: "Projects", url: "/allprojects", icon: FolderOpen },
+      // { title: "Ai Talk", url: "/ai-talk", icon: Bot },
+      {
+        title: "Schedule Projects",
+        url: "/calender-projects",
+        icon: CalendarRange,
+      },
+    ],
+    []
+  );
+
+  // OPTIMIZATION: Memoize sorted projects so we don't re-sort on every hover/render
+  const sortedProjects = React.useMemo(() => {
+    if (!projects) return [];
+    return [...projects].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [projects]);
+
+  // OPTIMIZATION: Handle navigation smoothly without blocking the main thread
+  const handleLinkClick = React.useCallback(() => {
+    startTransition(() => {
+      setOpen(false);
+    });
+  }, [setOpen]);
 
   const isActive = (url: string) => pathname === url;
 
@@ -82,7 +108,7 @@ export default function AppSidebar({
               {!hovered ? (
                 <Avatar className="hidden md:flex cursor-pointer transition-transform hover:scale-105">
                   <AvatarImage
-                    src="/todo-list-svgrepo-com.svg"
+                    src="/public/todo-list-svgrepo-com.svg"
                     alt="User Avatar"
                     className="h-8 w-8 p-1"
                   />
@@ -101,7 +127,7 @@ export default function AppSidebar({
             <>
               <Avatar className=" cursor-pointer">
                 <AvatarImage
-                  src="/todo-list-svgrepo-com.svg"
+                  src="/public/todo-list-svgrepo-com.svg"
                   alt="User Avatar"
                   className=" h-8 w-8 p-1"
                 />
@@ -131,13 +157,13 @@ export default function AppSidebar({
                   className={`flex ${
                     state === "expanded"
                       ? "flex-row"
-                      : "flex-col items-center justify-center ml-2"
+                      : "flex-col items-center justify-center "
                   } items-center`}
                 >
                   <Link
                     href={item.url}
                     className="w-full"
-                    onClick={() => setOpen(false)}
+                    onClick={handleLinkClick} // Used optimized handler
                   >
                     <SidebarMenuButton
                       tooltip={item.title}
@@ -151,14 +177,14 @@ export default function AppSidebar({
                       <item.icon className="cursor-pointer" size={20} />
                       <span
                         className="md:hidden text-[14px] font-medium cursor-pointer"
-                        onClick={() => setOpen(false)}
+                        onClick={handleLinkClick}
                       >
                         {item.title}
                       </span>
                       {state === "expanded" && (
                         <span
                           className="text-[14px] font-medium cursor-pointer"
-                          onClick={() => setOpen(false)}
+                          onClick={handleLinkClick}
                         >
                           {item.title}
                         </span>
@@ -197,7 +223,7 @@ export default function AppSidebar({
                   </Dialog>
                 </>
               ) : (
-                <div className=" w-full  px-2 flex justify-between items-center gap-1">
+                <div className=" w-full   flex justify-between items-center gap-1">
                   <SidebarGroupLabel className="flex md:hidden text-[12px] uppercase text-muted-foreground tracking-wide font-semibold">
                     Projects
                   </SidebarGroupLabel>
@@ -216,21 +242,16 @@ export default function AppSidebar({
               )}
             </div>
 
-            {/* Project List */}
-            <ScrollArea className="h-[h-64] mt-2">
-              <SidebarMenu className="space-y-0.5 mt-1">
-                {projects.length > 0 ? (
-                  [...projects]
-                    .sort(
-                      (a, b) =>
-                        new Date(b.createdAt).getTime() -
-                        new Date(a.createdAt).getTime()
-                    )
-                    .map((project) => (
+            {state === "expanded" && (
+              <ScrollArea className="h-[h-64] mt-2">
+                <SidebarMenu className="space-y-0.5 mt-1">
+                  {projects.length > 0 ? (
+                    // Used Memoized Sorted Projects
+                    sortedProjects.map((project) => (
                       <SidebarMenuItem key={project.id}>
                         <Link
                           href={`/projects/${project.id}`}
-                          onClick={() => setOpen(false)}
+                          onClick={handleLinkClick}
                           className="w-full"
                         >
                           <SidebarMenuButton
@@ -272,20 +293,21 @@ export default function AppSidebar({
                         </Link>
                       </SidebarMenuItem>
                     ))
-                ) : (
-                  <div className="text-center py-6 text-xs text-muted-foreground">
-                    {loading ? (
-                      <Loader />
-                    ) : (
-                      <>
-                        <p>No projects</p>
-                        <p>Add one to get started</p>
-                      </>
-                    )}
-                  </div>
-                )}
-              </SidebarMenu>
-            </ScrollArea>
+                  ) : (
+                    <div className="text-center py-6 text-xs text-muted-foreground">
+                      {loading ? (
+                        <Loader />
+                      ) : (
+                        <>
+                          <p>No projects</p>
+                          <p>Add one to get started</p>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </SidebarMenu>
+              </ScrollArea>
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

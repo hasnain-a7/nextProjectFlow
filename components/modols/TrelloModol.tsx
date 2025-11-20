@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Clock } from "lucide-react";
-import { FaEdit } from "react-icons/fa";
+import { Calendar, Clock, Edit } from "lucide-react";
+
 import TodoModel from "./TaskModol";
 import { Task } from "@/app/context/projectContext";
 import Image from "next/image";
@@ -64,11 +64,12 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
           <Image
             src={task.attachments[0]}
             alt="Task attachment"
-            className="w-full h-full object-cover"
-          />{" "}
+            fill
+            style={{ objectFit: "cover" }}
+            priority={true}
+          />
         </div>
       )}
-      {/* ✅ Add description here */}
       <DialogDescription></DialogDescription>
       <div className="p-6 sm:p-8 space-y-6">
         <DialogHeader>
@@ -84,8 +85,8 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     title="Edit Task"
                     className="p-2 rounded-md hover:bg-muted transition-colors"
                   >
-                    <FaEdit
-                      size={18}
+                    <Edit
+                      size={16}
                       className="text-muted-foreground hover:text-primary"
                     />
                   </button>

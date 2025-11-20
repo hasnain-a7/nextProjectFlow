@@ -21,8 +21,8 @@ import { useProjectContext } from "@/app/context/projectContext";
 import { useUserContextId } from "@/app/context/AuthContext";
 import DatePicker from "../DatePicker";
 import { Separator } from "../ui/separator";
-// import EmojiInput from "../EmojiInput";
 import Image from "next/image";
+import EmojiInput from "../EmojiInput";
 
 type ProjectToEdit = {
   id?: string;
@@ -199,12 +199,12 @@ export default function ProjectModol({
               />
 
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                {/* <EmojiInput
+                <EmojiInput
                   value={formData?.projectEmoji || ""}
                   onChange={(projectEmoji) =>
                     setFormData({ ...formData, projectEmoji })
                   }
-                /> */}
+                />
               </div>
             </div>
           </div>
@@ -227,17 +227,20 @@ export default function ProjectModol({
 
         <div className="flex flex-col h-full gap-4">
           <div className="bg-accent/25 rounded-lg p-4 border flex flex-col items-center justify-center gap-4">
-            {formData.attachments?.[0] ? (
-              <Image
-                src={formData.attachments[0]}
-                alt="Preview"
-                className="w-full  h-52 object-cover shadow-sm"
-              />
-            ) : (
-              <div className="w-full  h-52 flex items-center justify-center border border-dashed text-muted-foreground text-sm">
-                No image uploaded
-              </div>
-            )}
+            <div className="relative w-full h-52">
+              {formData.attachments?.[0] ? (
+                <Image
+                  src={formData.attachments[0]}
+                  alt="Preview"
+                  fill // <-- makes image fill parent
+                  className="object-cover shadow-sm rounded-lg"
+                />
+              ) : (
+                <div className="w-full h-52 flex items-center justify-center border border-dashed text-muted-foreground text-sm">
+                  No image uploaded
+                </div>
+              )}
+            </div>
 
             <Input
               type="file"

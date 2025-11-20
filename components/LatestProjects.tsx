@@ -3,11 +3,12 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { FaEdit } from "react-icons/fa";
+
 import { Badge } from "./ui/badge";
 import { Project } from "@/app/context/projectContext";
 import ProjectModol from "./modols/ProjectModol";
 import { useRouter } from "next/navigation";
+import { Edit } from "lucide-react";
 
 interface LatestProjectProps {
   LatestProjects: Project[];
@@ -17,7 +18,7 @@ const LatestProject: React.FC<LatestProjectProps> = ({ LatestProjects }) => {
   const navigate = useRouter();
   const handleNavigateToPage = (projectId: string | undefined) => {
     if (projectId) {
-      navigate.push(`/project/${projectId}`);
+      navigate.push(`/projects/${projectId}`);
     }
   };
   const top5UpdatedProjects = [...LatestProjects]
@@ -39,9 +40,9 @@ const LatestProject: React.FC<LatestProjectProps> = ({ LatestProjects }) => {
       </CardHeader>
 
       {top5UpdatedProjects.length > 0 ? (
-        <ScrollArea className="w-full pr-1">
+        <ScrollArea className="w-full   pr-1">
           <CardContent className="max-h-[198px] p-0 -mt-1">
-            <div className="flex flex-col gap-2 p-1">
+            <div className="flex flex-col  gap-2 p-1">
               {top5UpdatedProjects.map((project) => (
                 <Card
                   key={project.id}
@@ -72,7 +73,7 @@ const LatestProject: React.FC<LatestProjectProps> = ({ LatestProjects }) => {
                       <div className="flex gap-2">
                         <Dialog>
                           <DialogTrigger asChild>
-                            <FaEdit
+                            <Edit
                               size={16}
                               onClick={(e) => {
                                 e.stopPropagation();

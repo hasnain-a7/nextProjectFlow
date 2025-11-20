@@ -9,8 +9,7 @@ import {
 } from "./ui/card";
 
 import { Progress } from "./ui/progress";
-import { Calendar, Paperclip, UsersIcon } from "lucide-react";
-import { FaEdit } from "react-icons/fa";
+import { Calendar, Edit, Paperclip, UsersIcon } from "lucide-react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProjectModol from "./modols/ProjectModol";
 import Image from "next/image";
@@ -94,10 +93,10 @@ export const ProjectCard = ({
       onClick={handleCardClick}
       className="w-full relative border border-border/50 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden pb-1"
     >
-      {/* <div className="w-full h-30 md:h-12 -mt-3">
+      <div className="w-full h-30 md:h-12 -mt-3">
         {projectToShow?.attachments?.[0] ? (
           <Image
-            src={projectToShow.attachments[0]} // Base64 string
+            src={projectToShow.attachments[0]}
             alt={
               projectToShow.title ||
               "https://images.unsplash.com/photo-1486286701208-1d58e9338013?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -115,21 +114,21 @@ export const ProjectCard = ({
             className="object-cover w-full h-full"
           />
         )}
-      </div> */}
+      </div>
 
       {/* Header */}
       <CardHeader className="-mt-1 relative">
         {projectToShow?.projectEmoji && (
-          <span className="text-lg absolute top-30 md:top-12 left-0">
+          <span className="text-lg absolute top-30 md:top-0 left-0">
             {projectToShow.projectEmoji}
           </span>
         )}
         <Dialog>
           <DialogTrigger asChild>
-            <FaEdit
+            <Edit
               size={16}
               onClick={(e) => e.stopPropagation()}
-              className="absolute top-32 md:top-13 right-2 text-muted-foreground hover:text-primary cursor-pointer"
+              className="absolute top-32 md:top-2 right-2 text-muted-foreground hover:text-primary cursor-pointer"
             />
           </DialogTrigger>
           <ProjectModol ProjectToEdit={projectToShow} />

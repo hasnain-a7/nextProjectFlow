@@ -39,7 +39,7 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({ setopen, state }) => {
             className={`relative w-full transition-all duration-200 ${
               state === "expanded"
                 ? "flex  px-1 py-6"
-                : "flex flex-col items-center justify-center  ml-2 py-3"
+                : "flex flex-col items-center justify-center  py-3"
             }`}
             onClick={() => {
               if (state === "collapsed") setopen(true);
