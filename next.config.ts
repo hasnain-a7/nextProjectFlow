@@ -4,10 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; img-src 'self' data: blob:;",
-    domains: [
-      "images.unsplash.com",
-      "img.freepik.com", // 👈 add this
-    ],
+    domains: ["images.unsplash.com", "img.freepik.com", "wallpapercave.com"],
   },
 };
 

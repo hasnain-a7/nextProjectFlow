@@ -4,9 +4,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Edit, Eye, FileText, Info, InfoIcon, Trash2 } from "lucide-react";
-import { MdDeleteOutline } from "react-icons/md";
-import { FaEdit } from "react-icons/fa";
+import { Edit, FileText, Info, Trash2 } from "lucide-react";
+
 import { useProjectContext, Task } from "@/app/context/projectContext";
 import TaskModol from "./modols/TaskModol";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";

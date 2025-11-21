@@ -131,25 +131,23 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userData, setuserData] = useState<User>({} as User);
   const [loading, setLoading] = useState(false);
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserData = async (userId: string): Promise<User | undefined> => {
     try {
       const userRef = doc(db, "users", userId);
-      const userSnap = await getDocs(
-        query(collection(db, "users"), where("id", "==", userId))
-      );
-      console.log(userSnap);
-      const userDocSnap = await getDoc(userRef);
+      const userSnap = await getDoc(userRef);
 
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data() as User;
+      if (userSnap.exists()) {
+        const userData = userSnap.data() as User;
         setuserData(userData);
         return userData;
       } else {
         console.warn("⚠️ No user data found for:", userId);
-        setuserData({} as User);
+        setuserData(undefined as unknown as User);
+        return undefined;
       }
     } catch (error) {
       console.error("❌ Error fetching user data:", error);
+      return undefined;
     }
   };
 

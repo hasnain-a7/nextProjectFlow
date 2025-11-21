@@ -7,7 +7,7 @@ export default function HeroSection() {
   const router = useRouter();
 
   return (
-    <section className="relative text-center py-14 px-4 sm:px-6 bg-gradient-to-b from-black to-gray-900 text-white">
+    <section className="relative text-center py-14 px-4 sm:px-6 bg-linear-to-b from-black to-gray-900 text-white">
       <div className="max-w-5xl mx-auto flex flex-col items-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-5xl font-semibold leading-tight mb-4">
           Take control of Project <br className="hidden sm:block" /> Manager
@@ -22,7 +22,7 @@ export default function HeroSection() {
         <div className="flex flex-col sm:flex-row justify-center gap-3 w-full sm:w-auto">
           <Button
             className="rounded-full w-full sm:w-auto text-sm sm:text-base"
-            onClick={() => router.push("/signup")}
+            onClick={() => router.push("/SignUp")}
           >
             Get Started
           </Button>

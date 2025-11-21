@@ -2,15 +2,14 @@
 
 import * as React from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic"; // OPTIMIZATION: For lazy loading
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { IoHomeOutline } from "react-icons/io5";
 import { AiOutlinePlus } from "react-icons/ai";
 import { Separator } from "./ui/separator";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Bot, FolderOpen, CalendarRange } from "lucide-react";
+import { FolderOpen, CalendarRange, Bot } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
-// OPTIMIZATION: Lazy load the modal so it doesn't slow down initial render
 const ProjectModol = dynamic(() => import("./modols/ProjectModol"), {
   ssr: false,
 });
@@ -46,17 +45,16 @@ export default function AppSidebar({
     () => [
       { title: "Home", url: "/Home", icon: IoHomeOutline },
       { title: "Projects", url: "/allprojects", icon: FolderOpen },
-      // { title: "Ai Talk", url: "/ai-talk", icon: Bot },
       {
-        title: "Schedule Projects",
-        url: "/calender-projects",
+        title: "Schedule",
+        url: "/schedule",
         icon: CalendarRange,
       },
+      { title: "Ai Chat", url: "/chatai", icon: Bot },
     ],
     []
   );
 
-  // OPTIMIZATION: Memoize sorted projects so we don't re-sort on every hover/render
   const sortedProjects = React.useMemo(() => {
     if (!projects) return [];
     return [...projects].sort(
@@ -108,7 +106,7 @@ export default function AppSidebar({
               {!hovered ? (
                 <Avatar className="hidden md:flex cursor-pointer transition-transform hover:scale-105">
                   <AvatarImage
-                    src="/public/todo-list-svgrepo-com.svg"
+                    src="/todo-list-svgrepo-com.svg"
                     alt="User Avatar"
                     className="h-8 w-8 p-1"
                   />
@@ -127,7 +125,7 @@ export default function AppSidebar({
             <>
               <Avatar className=" cursor-pointer">
                 <AvatarImage
-                  src="/public/todo-list-svgrepo-com.svg"
+                  src="/todo-list-svgrepo-com.svg"
                   alt="User Avatar"
                   className=" h-8 w-8 p-1"
                 />

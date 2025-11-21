@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useUserContextId } from "@/app/context/AuthContext";
 
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+
 import { type User } from "@/app/context/AuthContext";
+import Link from "next/link";
 const SignUp: React.FC = () => {
   const [password, setPassword] = useState<string>("");
 
@@ -151,14 +152,14 @@ const SignUp: React.FC = () => {
         <p className="flex gap-2 justify-center items-center text-sm text-center text-gray-400 mt-6">
           Already have an account?
           <Link
-            to="/login"
+            href="/Login"
             className="text-primary font-medium hover:underline"
           >
             Sign in
           </Link>
         </p>
         <p className="text-sm text-center mt-2">
-          <Link to="/" className="text-chart-1  hover:underline">
+          <Link href="/" className="text-chart-1  hover:underline">
             Back to Home
           </Link>
         </p>

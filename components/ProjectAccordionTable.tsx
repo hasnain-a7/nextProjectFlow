@@ -16,8 +16,8 @@ import TaskDetailsAccordion from "./TaskaccordionDetails";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import TaskModol from "./modols/TaskModol";
 import ProjectOptions from "./TaskOptions";
-// import ProjectChatModal from "./ProjectChatModal";
 import Image from "next/image";
+import ProjectChatModal from "./modols/ProjectChatModal";
 interface TaskAccordionTableProps {
   tasks: Task[];
   loading: boolean;
@@ -185,7 +185,7 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
           </div>
         </div>
         <div className="fixed bottom-8 right-4 z-50">
-          {/* <ProjectChatModal projectId={projectId!} /> */}
+          <ProjectChatModal projectId={projectId!} />
         </div>
 
         <Accordion

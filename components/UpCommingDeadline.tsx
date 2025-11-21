@@ -19,9 +19,10 @@ export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
       (a, b) =>
         new Date(a.dueDate ?? 0).getTime() - new Date(b.dueDate ?? 0).getTime()
     )
-    .slice(0, 5);
+    .slice(0, 4);
   const navigate = useRouter();
-  const handleProjectClick = (id: string) => navigate.push(`/project/${id}`);
+  const handleProjectClick = (id: string) => navigate.push(`/projects/${id}`);
+  const handleScheduleClick = () => navigate.push(`/schedule`);
   return (
     <Card className="relative border border-border/50 rounded-lg w-full  max-h-min">
       <CardHeader className="px-3">
@@ -29,8 +30,12 @@ export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
           <CalendarDays size={16} />
           Upcoming Deadlines
         </CardTitle>
-        <Badge variant="outline" className="text-sx absolute top-2 right-3">
-          {sorted.length}
+        <Badge
+          variant="outline"
+          className=" absolute top-2 right-3"
+          onClick={handleScheduleClick}
+        >
+          veiw
         </Badge>
       </CardHeader>
       <ScrollArea className="w-full ">
