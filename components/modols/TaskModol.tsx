@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import DatePicker from "../DatePicker";
-import { useParams } from "react-router-dom";
+import { useParams } from "next/navigation";
 import { Separator } from "../ui/separator";
 import Image from "next/image";
 import EmojiInput from "../EmojiInput";
@@ -85,12 +85,16 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
     []
   );
 
+  const normalizedProjectId = Array.isArray(projectid)
+    ? projectid[0]
+    : projectid;
+
   const handleSubmit = useCallback(async () => {
     if (!formData.title.trim()) return;
     setLoading(true);
 
     try {
-      const activeProjectId = projectId || projectid;
+      const activeProjectId = projectId || normalizedProjectId;
       if (!activeProjectId) throw new Error("❌ No project ID found");
 
       if (taskToEdit?.id) {
@@ -117,7 +121,7 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
     addTaskToProject,
     updateTaskInProject,
     projectId,
-    projectid,
+    normalizedProjectId,
     formData,
     taskToEdit,
   ]);
