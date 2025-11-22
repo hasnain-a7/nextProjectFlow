@@ -13,7 +13,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { motion, AnimatePresence } from "framer-motion"; // Added AnimatePresence
+import { motion, AnimatePresence, Variants } from "framer-motion"; // Added AnimatePresence
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -29,7 +29,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Separator } from "@/components/ui/separator";
 import { AiFeatureCard } from "@/components/AiFeaturedCard";
 import { QuickNoteCard } from "@/components/QuickNoteCard";
 
@@ -48,10 +47,14 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } },
-  exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 300 },
+  },
+  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
 };
 
 const HomePage = () => {

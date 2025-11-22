@@ -4,7 +4,26 @@ const nextConfig: NextConfig = {
   images: {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; img-src 'self' data: blob:;",
-    domains: ["images.unsplash.com", "img.freepik.com", "wallpapercave.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "img.freepik.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "wallpapercave.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

@@ -204,7 +204,7 @@ export default function CalendarPage() {
                     {selectedData.tasks.map((task) => (
                       <AccordionItem
                         key={task?.id}
-                        value={task?.id}
+                        value={task.id ?? ""}
                         className="border rounded-lg px-4 bg-card hover:bg-accent/5 transition-colors"
                       >
                         <AccordionTrigger className="hover:no-underline py-3">
@@ -253,7 +253,7 @@ export default function CalendarPage() {
                               <span className="capitalize">
                                 Priority:{" "}
                                 <span className="text-foreground font-medium">
-                                  {task?.priority || "Normal"}
+                                  Normal
                                 </span>
                               </span>
                               <span className="capitalize">
