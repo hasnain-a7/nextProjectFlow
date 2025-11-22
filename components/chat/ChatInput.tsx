@@ -44,7 +44,7 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Message AI Assistant..."
+              placeholder="Ask Gemini Anything..."
               className="max-h-40 min-h-14 resize-none border-0 bg-card px-4 py-4 pr-32 text-[15px] leading-6 placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0"
               rows={1}
             />

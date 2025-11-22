@@ -24,7 +24,7 @@ const AssignProjects: React.FC = () => {
   return (
     <>
       <motion.main
-        className="relative min-h-screen overflow-hidden p-2"
+        className="relative min-h-screen overflow-hidden py-2 px-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}

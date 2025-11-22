@@ -1,96 +1,134 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useUserContextId } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useUserContextId } from "@/app/context/AuthContext";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Mail, Lock, Loader2, AlertCircle } from "lucide-react";
 
 const SignIn: React.FC = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const { login, userContextId } = useUserContextId();
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     try {
       await login(email, password);
     } catch (error) {
-      alert(`Login failed ${(error as Error).message}`);
+      setError((error as Error).message);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (userContextId) {
-      router.push("/Home"); // points to (protected)/page.tsx
-    }
+    if (userContextId) router.push("/Home");
   }, [userContextId, router]);
 
   return (
-    <Card className="w-full  max-w-sm mx-auto md:mt-10 shadow-xl">
-      <CardHeader>
-        <CardTitle className="text-2xl text-center">Sign In</CardTitle>
-        <CardDescription className="text-center mb-2">
-          Welcome back! Please enter your details.
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent>
-        <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
-          <Input
-            type="email"
-            placeholder="example123@gmail.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={loading}
-          />
-
-          <Input
-            type="password"
-            placeholder="********"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-
-          <Button type="submit" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
-          </Button>
-        </form>
-
-        <p className="text-sm text-center mt-3">
-          Do not have an account?{" "}
-          <Link
-            href="/SignUp"
-            className="text-primary font-medium hover:underline"
-          >
-            Sign up
-          </Link>
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full"
+    >
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+          Welcome Back
+        </h1>
+        <p className="text-muted-foreground">
+          Sign in to continue your journey.
         </p>
+      </div>
 
-        <p className="text-sm text-center mt-2">
-          <Link href="/" className="text-chart-1 hover:underline">
-            Back to Home
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+      {/* Error */}
+      {error && (
+        <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-2 text-red-400 text-sm">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Form */}
+      <form onSubmit={handleLoginSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-zinc-300">
+            Email Address
+          </Label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+            <Input
+              id="email"
+              type="email"
+              placeholder="name@example.com"
+              className="pl-10 h-11 bg-zinc-900/50 border-zinc-800 text-white focus:ring-primary focus:border-primary placeholder:text-zinc-600 transition-all rounded-lg"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password" className="text-zinc-300">
+            Password
+          </Label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              className="pl-10 h-11 bg-zinc-900/50 border-zinc-800 text-white focus:ring-primary focus:border-primary placeholder:text-zinc-600 transition-all rounded-lg"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+              required
+            />
+          </div>
+        </div>
+
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-11 font-medium transition-all shadow-lg shadow-primary/20 rounded-lg mt-2"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Signing in...
+            </>
+          ) : (
+            "Sign In"
+          )}
+        </Button>
+      </form>
+
+      {/* Footer */}
+      <div className="mt-2  text-sm text-zinc-500">
+        Don’t have an account?{" "}
+        <Link
+          href="/SignUp"
+          className="text-primary hover:text-primary/80 font-medium hover:underline transition-colors"
+        >
+          Create one
+        </Link>
+      </div>
+    </motion.div>
   );
 };
 

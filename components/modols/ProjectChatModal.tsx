@@ -249,7 +249,7 @@ export default function ProjectChatModal({ projectId }: { projectId: string }) {
                 </ScrollArea>
               </div>
 
-              <div className="flex-1 flex flex-col bg-background">
+              <div className="flex-1  flex flex-col bg-background">
                 <ScrollArea
                   ref={scrollContainerRef}
                   className="flex-1 h-[40vh] px-4 py-2"

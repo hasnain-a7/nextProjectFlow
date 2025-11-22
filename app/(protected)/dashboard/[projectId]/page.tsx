@@ -208,8 +208,8 @@ const DashboardPage: React.FC = () => {
 
                       {(statusTasks[statusKey] || []).map((todo, index) => (
                         <Draggable
-                          key={todo.id}
-                          draggableId={todo.id}
+                          key={todo?.id ?? ""}
+                          draggableId={todo?.id ?? ""}
                           index={index}
                         >
                           {(provided) => (

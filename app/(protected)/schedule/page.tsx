@@ -24,7 +24,7 @@ import {
 import { useRouter } from "next/navigation";
 export default function CalendarPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [viewMode, setViewMode] = useState<"projects" | "tasks">("tasks");
+  const [viewMode, setViewMode] = useState<"projects" | "tasks">("projects");
   const { projects } = useProjectContext();
   const navigate = useRouter();
   const handleProjectClick = (id: string) => navigate.push(`/projects/${id}`);

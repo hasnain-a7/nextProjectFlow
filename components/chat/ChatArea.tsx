@@ -104,7 +104,7 @@ export default function ChatArea() {
 
           {isLoading && (
             <div className="flex items-center gap-2 text-muted-foreground animate-pulse">
-              <span className="ml-2 text-sm">Assistant is typing...</span>
+              <span className="ml-2 text-sm">Gemini is thinking...</span>
             </div>
           )}
 

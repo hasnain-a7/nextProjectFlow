@@ -22,18 +22,22 @@ export default function Navbar() {
     }
   });
 
-  const navbarVariants = {
-    hidden: { y: -15, opacity: 0 },
+  const myVariants = {
+    hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: {
+        duration: 0.5,
+
+        ease: "easeOut" as const,
+      },
     },
   };
 
   return (
     <motion.header
-      variants={navbarVariants}
+      variants={myVariants}
       initial="hidden"
       animate="visible"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
