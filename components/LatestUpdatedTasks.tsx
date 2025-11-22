@@ -31,7 +31,7 @@ const LatestUpdatedTasks: React.FC<LatestUpdatedTasksProps> = ({
 }) => {
   return (
     <Card
-      className={`w-full  pb-1 pt-1 min-h-min border-none border-border/50 rounded-lg mt-2 bg-card transition-all duration-300 `}
+      className={`w-full  pb-0.5 pt-1 min-h-min border-none border-border/50 rounded-lg mt-2 bg-card transition-all duration-300 `}
     >
       <CardHeader className="flex justify-between -ml-3">
         <CardTitle className="text-md">Recently Updated Tasks</CardTitle>
@@ -42,7 +42,7 @@ const LatestUpdatedTasks: React.FC<LatestUpdatedTasksProps> = ({
 
       {latestTasks.length > 0 && (
         <ScrollArea className=" w-full pr-1">
-          <CardContent className="max-h-[355px] p-0 -mt-1">
+          <CardContent className="max-h-[350px] p-0 -mt-1">
             <div className="flex flex-col gap-2 p-1">
               {latestTasks.map((task) => (
                 <Card

@@ -48,6 +48,7 @@ export default function ChatArea() {
           content: data.generated_text || "Failed to get response.",
         },
       ]);
+      console.log("Response data:", data);
     } catch (err) {
       console.error(err);
       setMessages((prev: Message[]) => [
@@ -89,7 +90,7 @@ export default function ChatArea() {
           </div>
         )}
 
-        <div className="flex flex-col gap-3 max-w-3xl mx-auto">
+        <div className="flex flex-col gap-3 w-full md:max-w-3xl mx-auto">
           {messages.map((msg, index) => (
             <ChatMessage
               key={index}

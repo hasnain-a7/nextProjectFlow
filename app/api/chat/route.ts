@@ -1,54 +1,55 @@
-// pages/api/chat.ts
-import type { NextApiRequest, NextApiResponse } from "next";
-import { GoogleGenerativeAI, Content } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
+import { NextResponse } from "next/server";
 
-// Initialize Gemini with your API key
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
+export async function POST(req: Request) {
   try {
-    const { messages } = req.body;
-
-    if (!messages || messages.length === 0) {
-      return res.status(400).json({ generated_text: "No messages provided." });
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Server Error: Missing API Key" },
+        { status: 500 }
+      );
     }
 
-    // 1. Extract the user's latest message
-    const lastMessage = messages[messages.length - 1];
-    const userPrompt = lastMessage.content;
+    const body = await req.json();
+    const { messages } = body;
 
-    // 2. Format previous history for Gemini
-    // Gemini uses 'user' and 'model' roles, while your app likely sends 'user' and 'assistant'
-    const history: Content[] = messages.slice(0, -1).map((msg: any) => ({
+    if (!messages || !Array.isArray(messages)) {
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 }
+      );
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+
+    const formattedContents = messages.map((msg: any) => ({
       role: msg.role === "assistant" ? "model" : "user",
       parts: [{ text: msg.content }],
     }));
 
-    // 3. Select the model (Gemini 1.5 Flash is fast and free)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    // 4. Start the chat with history
-    const chat = model.startChat({
-      history: history,
+    // CHANGED: Using the specific pinned version 'gemini-1.5-flash-001'
+    // This resolves the 404 error for the generic alias
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: formattedContents,
     });
 
-    // 5. Send the new message
-    const result = await chat.sendMessage(userPrompt);
-    const response = await result.response;
-    const text = response.text();
+    const generatedText = result.text;
 
-    console.log("Gemini Response:", text);
+    if (!generatedText) {
+      return NextResponse.json({ generated_text: "No response generated." });
+    }
 
-    res.status(200).json({ generated_text: text });
-  } catch (err) {
-    console.error("❌ Gemini API error:", err);
-    res.status(500).json({ generated_text: "Failed to get response." });
+    return NextResponse.json({ generated_text: generatedText });
+  } catch (error: any) {
+    console.error("❌ Gemini API Error:", error);
+    return NextResponse.json(
+      {
+        error: "AI Service Failed",
+        details: error.message,
+      },
+      { status: 500 }
+    );
   }
 }

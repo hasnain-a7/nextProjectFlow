@@ -35,8 +35,7 @@ export default function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { projects, loading } = useProjectContext();
-  const { setOpen, state } = useSidebar();
-  const [hovered, setHovered] = React.useState(false);
+  const { setOpen, state, isMobile } = useSidebar();
   const pathname = usePathname();
 
   const [isPending, startTransition] = React.useTransition();
@@ -83,8 +82,6 @@ export default function AppSidebar({
         <span className="font-semibold text-base tracking-tight">Menu</span>
         <SidebarTrigger className="scale-90" />
       </div>
-
-      {/* Avatar */}
       <div
         className={`flex items-center ${
           state === "collapsed"
@@ -98,36 +95,27 @@ export default function AppSidebar({
           }`}
         >
           {state === "collapsed" ? (
-            <div
-              className="relative flex items-center justify-center"
-              onMouseEnter={() => setHovered(true)}
-              onMouseLeave={() => setHovered(false)}
-            >
-              {!hovered ? (
-                <Avatar className="hidden md:flex cursor-pointer transition-transform hover:scale-105">
-                  <AvatarImage
-                    src="/todo-list-svgrepo-com.svg"
-                    alt="User Avatar"
-                    className="h-8 w-8 p-1"
-                  />
-                  <AvatarFallback className="text-[13px] font-medium">
-                    U
-                  </AvatarFallback>
-                </Avatar>
-              ) : (
-                <SidebarTrigger
-                  className="transition-all duration-200 scale-110 cursor-pointer"
-                  onClick={() => setHovered(false)}
-                />
-              )}
-            </div>
-          ) : (
-            <>
-              <Avatar className=" cursor-pointer">
+            /* --- COLLAPSED STATE: IMAGE ONLY (No Trigger, No Hover Effect) --- */
+            <div className="relative flex items-center justify-center">
+              <Avatar className="hidden md:flex cursor-default transition-transform hover:scale-105">
                 <AvatarImage
                   src="/todo-list-svgrepo-com.svg"
                   alt="User Avatar"
-                  className=" h-8 w-8 p-1"
+                  className="h-8 w-8 p-1"
+                />
+                <AvatarFallback className="text-[13px] font-medium">
+                  U
+                </AvatarFallback>
+              </Avatar>
+            </div>
+          ) : (
+            /* --- EXPANDED STATE: IMAGE + TEXT --- */
+            <>
+              <Avatar className="cursor-pointer">
+                <AvatarImage
+                  src="/todo-list-svgrepo-com.svg"
+                  alt="User Avatar"
+                  className="h-8 w-8 p-1"
                 />
                 <AvatarFallback className="text-[13px] font-medium">
                   U
@@ -140,6 +128,7 @@ export default function AppSidebar({
           )}
         </div>
 
+        {/* Only show the trigger button when the sidebar is already expanded */}
         {state === "expanded" && <SidebarTrigger className="scale-100" />}
       </div>
 
@@ -240,72 +229,73 @@ export default function AppSidebar({
               )}
             </div>
 
-            {state === "expanded" && (
-              <ScrollArea className="h-[h-64] mt-2">
-                <SidebarMenu className="space-y-0.5 mt-1">
-                  {projects.length > 0 ? (
-                    // Used Memoized Sorted Projects
-                    sortedProjects.map((project) => (
-                      <SidebarMenuItem key={project.id}>
-                        <Link
-                          href={`/projects/${project.id}`}
-                          onClick={handleLinkClick}
-                          className="w-full"
-                        >
-                          <SidebarMenuButton
-                            tooltip={project?.title}
-                            isActive={pathname === `/projects/${project.id}`}
-                            className={`flex items-center justify-between gap-2 px-2 py-1.5 rounded-md text-[13px] font-medium truncate transition-colors ${
-                              pathname === `/projects/${project.id}`
-                                ? "bg-primary text-white"
-                                : "hover:bg-sidebar-accent/70 hover:text-foreground"
-                            }`}
+            {state === "expanded" ||
+              (isMobile && (
+                <ScrollArea className="h-[h-64] mt-2">
+                  <SidebarMenu className="space-y-0.5 mt-1">
+                    {projects.length > 0 ? (
+                      // Used Memoized Sorted Projects
+                      sortedProjects.map((project) => (
+                        <SidebarMenuItem key={project.id}>
+                          <Link
+                            href={`/projects/${project.id}`}
+                            onClick={handleLinkClick}
+                            className="w-full"
                           >
-                            <div className="flex items-center gap-2 truncate">
-                              <FolderOpen
-                                size={14}
-                                className={
-                                  pathname === `/projects/${project.id}`
-                                    ? "text-white"
-                                    : "text-muted-foreground"
-                                }
-                              />
-                              <span className="truncate max-w-[110px]">
-                                {project.title.charAt(0).toUpperCase() +
-                                  project.title.slice(1)}
-                              </span>
-                            </div>
-                            {project?.Tasks?.length &&
-                              project?.Tasks?.length > 0 && (
-                                <span
-                                  className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                            <SidebarMenuButton
+                              tooltip={project?.title}
+                              isActive={pathname === `/projects/${project.id}`}
+                              className={`flex items-center justify-between gap-2 px-2 py-1.5 rounded-md text-[13px] font-medium truncate transition-colors ${
+                                pathname === `/projects/${project.id}`
+                                  ? "bg-primary text-white"
+                                  : "hover:bg-sidebar-accent/70 hover:text-foreground"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 truncate">
+                                <FolderOpen
+                                  size={14}
+                                  className={
                                     pathname === `/projects/${project.id}`
-                                      ? "bg-white/20 text-white"
-                                      : "bg-muted text-muted-foreground"
-                                  }`}
-                                >
-                                  {project?.Tasks.length}
+                                      ? "text-white"
+                                      : "text-muted-foreground"
+                                  }
+                                />
+                                <span className="truncate max-w-[110px]">
+                                  {project.title.charAt(0).toUpperCase() +
+                                    project.title.slice(1)}
                                 </span>
-                              )}
-                          </SidebarMenuButton>
-                        </Link>
-                      </SidebarMenuItem>
-                    ))
-                  ) : (
-                    <div className="text-center py-6 text-xs text-muted-foreground">
-                      {loading ? (
-                        <Loader />
-                      ) : (
-                        <>
-                          <p>No projects</p>
-                          <p>Add one to get started</p>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </SidebarMenu>
-              </ScrollArea>
-            )}
+                              </div>
+                              {project?.Tasks?.length &&
+                                project?.Tasks?.length > 0 && (
+                                  <span
+                                    className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                                      pathname === `/projects/${project.id}`
+                                        ? "bg-white/20 text-white"
+                                        : "bg-muted text-muted-foreground"
+                                    }`}
+                                  >
+                                    {project?.Tasks.length}
+                                  </span>
+                                )}
+                            </SidebarMenuButton>
+                          </Link>
+                        </SidebarMenuItem>
+                      ))
+                    ) : (
+                      <div className="text-center py-6 text-xs text-muted-foreground">
+                        {loading ? (
+                          <Loader />
+                        ) : (
+                          <>
+                            <p>No projects</p>
+                            <p>Add one to get started</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </SidebarMenu>
+                </ScrollArea>
+              ))}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

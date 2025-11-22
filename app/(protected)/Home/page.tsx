@@ -30,6 +30,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
+import { AiFeatureCard } from "@/components/AiFeaturedCard";
+import { QuickNoteCard } from "@/components/QuickNoteCard";
 
 // 1. LAZY LOAD: Only import the Modal when needed to save initial bundle size
 const ProjectModol = lazy(() => import("@/components/modols/ProjectModol"));
@@ -167,7 +169,7 @@ const HomePage = () => {
     setFilteredCategory(value === "all" ? "" : value);
 
   const { currentProjects, totalPages } = useMemo(() => {
-    const projectsPerPage = 6;
+    const projectsPerPage = 8;
     const total = Math.ceil(filteredProjects.length / projectsPerPage);
 
     const sorted = [...filteredProjects].sort(
@@ -204,7 +206,7 @@ const HomePage = () => {
               transition={{ duration: 0.5 }}
               className="mb-1"
             >
-              <div className="grid px-0.5 py-0.5 auto-rows-min gap-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
+              <div className="grid px-0.5  auto-rows-min gap-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
                 <StatsCard
                   title="Projects"
                   value={projects.length}
@@ -231,12 +233,14 @@ const HomePage = () => {
                 />
               </div>
             </motion.section>
-
             <section className="flex flex-col lg:flex-row h-full w-full gap-2">
+              {/* Increased gap slightly for large screens */}
+              {/* --- LEFT SECTION (Main Content) --- */}
               <div className="flex-1 min-w-0">
                 <div className="flex flex-col gap-2">
+                  {/* Header / Filter Section */}
                   <div className="flex flex-col md:flex-row lg:flex-row lg:items-center lg:justify-between w-full gap-2 pt-2 shadow-sm">
-                    <div className="relative flex items-center  w-full sm:max-w-sm md:max-w-full lg:max-w-full xl:w-full ">
+                    <div className="relative flex items-center w-full sm:max-w-sm md:max-w-full lg:max-w-full xl:w-full">
                       <Search
                         className="absolute left-3 text-muted-foreground"
                         size={18}
@@ -246,7 +250,7 @@ const HomePage = () => {
                         placeholder="Search..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 pr-8 py-1 text-sm  "
+                        className="pl-10 pr-8 py-1 text-sm"
                       />
                     </div>
 
@@ -292,14 +296,12 @@ const HomePage = () => {
                             className="min-w-min md:min-w-[120px] flex items-center gap-2 font-medium whitespace-nowrap"
                           >
                             <Plus size={18} />
-
                             <span className="hidden md:inline">
                               Add Project
                             </span>
-                            <span className=" md:hidden">Project</span>
+                            <span className="md:hidden">Project</span>
                           </Button>
                         </DialogTrigger>
-                        {/* LAZY LOAD: Wrapped in Suspense */}
                         <Suspense
                           fallback={
                             <div className="p-4">
@@ -310,6 +312,8 @@ const HomePage = () => {
                           <ProjectModol />
                         </Suspense>
                       </Dialog>
+
+                      {/* Pagination Card */}
                       <Card className="hidden md:block md:bg-blend-hard-light p-0 rounded-lg sticky bottom-4 left-0 right-0 mx-auto w-fit z-40">
                         <Pagination>
                           <PaginationContent className="flex justify-center items-center gap-3">
@@ -349,10 +353,10 @@ const HomePage = () => {
                       </Card>
                     </div>
                   </div>
-                  <Separator />
+                  {/* <Separator /> */}
 
                   <motion.div
-                    className="w-full min-h-[340px] md:min-h-[500px] lg:min-h-[340px] xl:h-full rounded-lg grid gap-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                    className="w-full min-h-[340px] md:min-h-[500px] lg:min-h-[340px] xl:h-full rounded-lg grid gap-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
                     variants={containerVariants}
                     initial="hidden"
                     animate="show"
@@ -391,7 +395,24 @@ const HomePage = () => {
                       )}
                     </AnimatePresence>
                   </motion.div>
+                  <div className=" flex flex-col md:flex-row gap-2">
+                    <UpcomingDeadlines projects={projects} />
 
+                    <motion.div
+                      variants={itemVariants}
+                      className="w-full h-full"
+                    >
+                      <QuickNoteCard />
+                    </motion.div>
+                    <motion.div
+                      variants={itemVariants}
+                      className="w-full h-full"
+                    >
+                      <AiFeatureCard />
+                    </motion.div>
+                  </div>
+
+                  {/* Mobile Pagination */}
                   {totalPages > 1 && (
                     <Pagination className="-mt-1 md:hidden lg:hidden xl:hidden">
                       <PaginationContent>
@@ -439,33 +460,31 @@ const HomePage = () => {
                   )}
                 </div>
               </div>
-
+              {/* --- RIGHT SECTION (Sidebar) --- */}
+              {/* Changed: Replaced percentage width with fixed constraints (shrink-0 lg:w-[350px] xl:w-[400px]) */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
                 className="flex min-h-[340px] flex-col gap-2 mt-2 
-                lg:flex-col lg:w-[40%] xl:w-[45%]"
+    lg:mt-0 lg:flex-col lg:w-[350px] xl:w-[400px] shrink-0"
               >
-                <div className="flex flex-col gap-2 sm:flex-col md:flex-row">
+                <div className="flex flex-col sm:flex-col md:flex-row lg:flex-col">
                   <Card
-                    className="max-h-[392px] bg-background flex p-0 border-none flex-col  
-                     w-full md:w-1/2"
+                    className="max-h-[392px] bg-background flex p-0 border-none flex-col 
+         w-full md:w-1/2 lg:w-full"
                   >
-                    <CardHeader className="flex justify-between -ml-5">
-                      <CardTitle className="text-md">
-                        Project Highlights
-                      </CardTitle>
+                    <CardHeader className="flex justify-between -ml-4">
+                      <CardTitle className="text-md"></CardTitle>
                     </CardHeader>
 
                     {projects.length > 0 && (
                       <>
-                        <UpcomingDeadlines projects={projects} />
                         <LatestProjects LatestProjects={projects} />
                       </>
                     )}
                   </Card>
-                  <div className="flex h-auto md:h-[200px] flex-col gap-2 w-full md:w-1/2 md:-mt-2">
+                  <div className="flex h-auto md:h-[200px] lg:h-auto flex-col gap-2 w-full md:w-1/2 lg:w-full  ">
                     <LatestUpdatedTasks latestTasks={latestTasks} />
                   </div>
                 </div>

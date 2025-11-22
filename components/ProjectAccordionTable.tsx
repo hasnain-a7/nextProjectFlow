@@ -142,7 +142,7 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
       </CardHeader>
       <CardContent>
         <div className="relative">
-          <p className="line-clamp-5 text-gray-300">
+          <p className="line-clamp-5 relative group text-gray-300">
             {specifictaskdata?.description ?? "No description available"}
           </p>
 
@@ -187,7 +187,6 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
         <div className="fixed bottom-8 right-4 z-50">
           <ProjectChatModal projectId={projectId!} />
         </div>
-
         <Accordion
           type="multiple"
           defaultValue={["backlog"]}
