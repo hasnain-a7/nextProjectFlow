@@ -79,7 +79,7 @@ export default function Navbar() {
             <Button
               variant="ghost"
               className="hidden md:flex text-muted-foreground hover:text-primary hover:bg-primary/5"
-              onClick={() => router.push("/Login")}
+              onClick={() => router.push("/SignIn")}
             >
               Sign In
             </Button>

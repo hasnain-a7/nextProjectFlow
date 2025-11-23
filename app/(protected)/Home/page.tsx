@@ -398,22 +398,24 @@ const HomePage = () => {
                       )}
                     </AnimatePresence>
                   </motion.div>
-                  <div className=" flex flex-col md:flex-row gap-2">
-                    <UpcomingDeadlines projects={projects} />
+                  {projects.length > 0 && (
+                    <div className=" flex flex-col md:flex-row gap-2">
+                      <UpcomingDeadlines projects={projects} />
 
-                    <motion.div
-                      variants={itemVariants}
-                      className="w-full h-full"
-                    >
-                      <QuickNoteCard />
-                    </motion.div>
-                    <motion.div
-                      variants={itemVariants}
-                      className="w-full h-full"
-                    >
-                      <AiFeatureCard />
-                    </motion.div>
-                  </div>
+                      <motion.div
+                        variants={itemVariants}
+                        className="w-full h-full"
+                      >
+                        <QuickNoteCard />
+                      </motion.div>
+                      <motion.div
+                        variants={itemVariants}
+                        className="w-full h-full"
+                      >
+                        <AiFeatureCard />
+                      </motion.div>
+                    </div>
+                  )}
 
                   {/* Mobile Pagination */}
                   {totalPages > 1 && (

@@ -53,7 +53,7 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
     return { label: "Low", className: "bg-accent text-accent-foreground" };
   };
 
-  const STATUSES = ["backlog", "pending", "inactive", "active", "completed"];
+  const STATUSES = ["backlog", "active", "pending", "inactive", "completed"];
 
   // Group tasks by status, ensure dueDate is always a string
   const groupedTasks = tasks.reduce((acc, task) => {
@@ -118,7 +118,6 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
               {specifictaskdata &&
                 specifictaskdata?.title.charAt(0).toUpperCase() +
                   specifictaskdata?.title.slice(1)}
-              Tasks
             </h5>
           </div>
 
