@@ -12,27 +12,30 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { ThemeProvider } from "../context/ThemeContext";
+
 export default function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { userContextId } = useUserContextId();
+  const { userContextId, loading } = useUserContextId();
   const router = useRouter();
 
   useEffect(() => {
-    if (!userContextId) {
-      router.replace("/Login");
+    if (!loading && !userContextId) {
+      router.replace("/SignIn");
     }
-  }, [userContextId, router]);
+  }, [loading, userContextId, router]);
 
-  if (!userContextId) {
+  if (loading) {
     return (
-      <div className=" flex items-center justify-center">
+      <div className="flex items-center justify-center h-screen">
         <Loader />
       </div>
     );
   }
+
+  if (!userContextId) return null;
 
   return (
     <ThemeProvider defaultTheme="dark">
@@ -40,10 +43,7 @@ export default function ProtectedLayout({
         <Sidebar />
 
         <SidebarInset>
-          <header
-            className="flex items-center justify-between border-b px-4 py-2 shadow-sm 
-             transition-all duration-200 ease-linear lg:hidden"
-          >
+          <header className="flex items-center justify-between border-b px-4 py-2 shadow-sm transition-all duration-200 ease-linear lg:hidden">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
               <Separator
@@ -54,9 +54,9 @@ export default function ProtectedLayout({
                 ProjectFlow
               </Breadcrumb>
             </div>
-            <Avatar className="cursor-pointer transition-transform duration-200 hover:scale-105 ">
+            <Avatar className="cursor-pointer hover:scale-105 transition-transform duration-200">
               <AvatarImage
-                src="/public/todo-list-svgrepo-com.svg"
+                src="/todo-list-svgrepo-com.svg"
                 alt="User Avatar"
                 className="h-8 w-8 p-1"
               />
@@ -65,9 +65,9 @@ export default function ProtectedLayout({
               </AvatarFallback>
             </Avatar>
           </header>
-          <div className="flex flex-col h-full w-full">
-            <main className="flex-1 overflow-auto ">{children}</main>
 
+          <div className="flex flex-col h-full w-full">
+            <main className="flex-1 overflow-auto">{children}</main>
             <LayoutFooter />
           </div>
         </SidebarInset>

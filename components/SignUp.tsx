@@ -242,7 +242,7 @@ const SignUp: React.FC = () => {
       <div className="mt-2  text-center text-sm text-zinc-500">
         Already have an account?{" "}
         <Link
-          href="/Login"
+          href="/SignIn"
           className="text-primary hover:text-primary/80 font-medium hover:underline transition-colors"
         >
           Sign in

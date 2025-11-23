@@ -124,9 +124,10 @@ export const ProjectCard = ({
           </span>
         )}
         <Dialog>
-          <DialogTrigger asChild onClick={(e) => e.stopPropagation()}>
+          <DialogTrigger asChild>
             <Edit
               size={16}
+              onClick={(e) => e.stopPropagation()}
               className="absolute top-32 md:top-2 right-2 text-muted-foreground hover:text-primary cursor-pointer"
             />
           </DialogTrigger>

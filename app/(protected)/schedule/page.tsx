@@ -22,10 +22,11 @@ import {
   ListTodo,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
 export default function CalendarPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [viewMode, setViewMode] = useState<"projects" | "tasks">("projects");
-  const { projects } = useProjectContext();
+  const { projects, loading } = useProjectContext();
   const navigate = useRouter();
   const handleProjectClick = (id: string) => navigate.push(`/projects/${id}`);
   const allTasks = useMemo(() => {
@@ -78,8 +79,16 @@ export default function CalendarPage() {
       };
     }
   }, [date, projects, allTasks, viewMode]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-full py-20">
+        <Loader />
+      </div>
+    );
+  }
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)] gap-6 p-4 md:p-4 overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-0.5rem)] gap-6 p-4 md:p-4 overflow-hidden">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Calendar</h1>
@@ -139,7 +148,7 @@ export default function CalendarPage() {
         </Card>
 
         {/* --- RIGHT COLUMN: CONTENT --- */}
-        <Card className="flex-1 border-border/50 shadow-sm overflow-hidden flex flex-col bg-background/50 backdrop-blur-sm">
+        <Card className="flex-1  border-border/50 shadow-sm overflow-hidden flex flex-col bg-background/50 backdrop-blur-sm">
           <CardHeader className="border-b -mt-3 py-4 bg-muted/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -167,7 +176,7 @@ export default function CalendarPage() {
             </div>
           </CardHeader>
 
-          <ScrollArea className="flex-1 p-2 md:p-4">
+          <ScrollArea className="flex-1 h-[80%] p-2 md:p-4">
             {viewMode === "projects" && (
               <div className="space-y-4">
                 {selectedData.projects.length > 0 ? (
@@ -280,7 +289,6 @@ export default function CalendarPage() {
   );
 }
 
-// Helper Component for Empty States to keep code Lite
 function EmptyState({ message }: { message: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-[40vh] text-center text-muted-foreground opacity-60">

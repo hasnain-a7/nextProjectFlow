@@ -169,7 +169,10 @@ export default function ProjectModol({
     ? ProjectToEdit?.userId === userContextId
     : true;
   return (
-    <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] p-4 bg-background shadow-[0_8px_30px_rgba(0,0,0,0.1)] border border-border">
+    <DialogContent
+      onClick={(e) => e.stopPropagation()}
+      className="w-[95vw] max-w-6xl max-h-[90vh] p-4 bg-background shadow-[0_8px_30px_rgba(0,0,0,0.1)] border border-border"
+    >
       <DialogHeader className="mb-6">
         <DialogTitle className="text-2xl font-semibold tracking-tight">
           {ProjectToEdit ? "Edit Project" : "Add New Project"}

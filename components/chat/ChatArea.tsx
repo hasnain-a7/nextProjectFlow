@@ -61,9 +61,9 @@ export default function ChatArea() {
   };
 
   const suggestions = [
-    "Explain quantum computing in simple terms",
-    "Give me a recipe for chocolate cake",
-    "Write a short poem about AI",
+    "Explain offside rule in Football",
+    "Which is the greatest Player of all time in Football?",
+    "Explain the difference between JS and Java",
   ];
 
   return (

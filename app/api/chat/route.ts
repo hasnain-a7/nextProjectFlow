@@ -23,13 +23,11 @@ export async function POST(req: Request) {
 
     const ai = new GoogleGenAI({ apiKey });
 
-    const formattedContents = messages.map((msg: any) => ({
+    const formattedContents = messages.map((msg) => ({
       role: msg.role === "assistant" ? "model" : "user",
       parts: [{ text: msg.content }],
     }));
 
-    // CHANGED: Using the specific pinned version 'gemini-1.5-flash-001'
-    // This resolves the 404 error for the generic alias
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: formattedContents,
@@ -42,12 +40,12 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ generated_text: generatedText });
-  } catch (error: any) {
-    console.error("❌ Gemini API Error:", error);
+  } catch (error) {
+    console.error("❌ Gemini API Error:", (error as Error).message);
     return NextResponse.json(
       {
         error: "AI Service Failed",
-        details: error.message,
+        details: (error as Error).message,
       },
       { status: 500 }
     );
