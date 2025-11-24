@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "dev.hasnain.site",
+        pathname: "/project/uploads/**",
+      },
     ],
   },
 };
