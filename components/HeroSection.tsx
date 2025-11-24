@@ -89,7 +89,9 @@ export default function HeroSection() {
               variant="outline"
               size="lg"
               className="rounded-full px-8 text-base bg-background/50 backdrop-blur-sm border-white/10 hover:bg-white/5"
-              onClick={() => router.push("/about")} // Assuming you have an about or demo page
+              onClick={() =>
+                window.open("https://youtu.be/0ajLMU9Elw8", "_blank")
+              }
             >
               View Demo
             </Button>
@@ -112,7 +114,7 @@ export default function HeroSection() {
 
               <div className="relative w-full h-[400px] md:h-[600px] bg-background/50">
                 <Image
-                  src="/hom2.png"
+                  src="https://dev.hasnain.site/project/uploads/sssfsd.png"
                   alt="App Dashboard Preview"
                   fill
                   className="object-cover"
