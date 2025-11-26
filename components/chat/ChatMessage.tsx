@@ -1,5 +1,3 @@
-"use client";
-
 import CopyButton from "@/components/CopyText";
 import { cn } from "@/lib/utils";
 import { Terminal } from "lucide-react";

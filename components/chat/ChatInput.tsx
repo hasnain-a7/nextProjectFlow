@@ -1,5 +1,3 @@
-"use client";
-
 import { Send, Paperclip, Mic, ImageIcon } from "lucide-react";
 
 import { useState, type FormEvent } from "react";

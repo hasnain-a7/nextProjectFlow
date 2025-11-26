@@ -9,10 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Loader from "@/components/Loader";
 
 const AssignProjects: React.FC = () => {
   const [search, setSearch] = useState("");
-  const { projects } = useProjectContext();
+  const { projects, loading } = useProjectContext();
   const navigate = useRouter();
 
   const filteredProjects = projects.filter((p) =>
@@ -20,7 +21,13 @@ const AssignProjects: React.FC = () => {
   );
 
   const handleProjectClick = (id: string) => navigate.push(`/projects/${id}`);
-
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader />
+      </div>
+    );
+  }
   return (
     <>
       <motion.main

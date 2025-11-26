@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         error: "AI Service Failed",
         details: (error as Error).message,
       },
-      { status: 500 }
+    { status: 500 }
     );
   }
 }
