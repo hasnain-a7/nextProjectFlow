@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { useProjectContext, Task } from "@/app/context/projectContext";
+import { useProjectContext, Task, Project } from "@/app/context/projectContext";
 import {
   DragDropContext,
   Droppable,
@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import Loader from "@/components/Loader";
 import { ChevronsRightLeft, Plus, Edit, Trash2 } from "lucide-react";
 import dynamic from "next/dynamic";
+import Loader from "@/components/Loader";
 
 // Lazy load modals
 const TaskDetailModal = dynamic(
@@ -38,7 +38,7 @@ const groupTasksByStatus = (Tasks: Task[], statuses: string[]) => {
 };
 
 const DashboardPage: React.FC = () => {
-  const { projects, loading, deleteTaskFromProject } = useProjectContext();
+  const { projects, deleteTaskFromProject, loading } = useProjectContext();
   const params = useParams();
   const router = useRouter();
   const projectId =
@@ -52,7 +52,7 @@ const DashboardPage: React.FC = () => {
   const currentProject = useMemo(() => {
     return projects.find((p) => p.id === projectId);
   }, [projects, projectId]);
-  const [prevProject, setPrevProject] = useState<any>(null);
+  const [prevProject, setPrevProject] = useState<Project>();
   const [statusTasks, setStatusTasks] = useState<{ [key: string]: any[] }>({});
   const [cardWidth, setCardWidth] = useState(false);
 
@@ -130,15 +130,13 @@ const DashboardPage: React.FC = () => {
       }
     }
   };
-
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full py-20">
+      <div className="flex justify-center items-center h-screen">
         <Loader />
       </div>
     );
   }
-
   return (
     <>
       <DragDropContext onDragEnd={handleDragEnd}>

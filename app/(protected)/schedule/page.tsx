@@ -39,7 +39,6 @@ export default function CalendarPage() {
       }))
     );
   }, [projects]);
-  // --- 2. DATE MAPPING (For Calendar Highlights) ---
   const attributes = useMemo(() => {
     if (viewMode === "projects") {
       return {
@@ -58,7 +57,6 @@ export default function CalendarPage() {
     }
   }, [projects, allTasks, viewMode]);
 
-  // --- 3. FILTERED DATA FOR SELECTED DATE ---
   const selectedData = useMemo(() => {
     if (!date) return { tasks: [], projects: [] };
 
@@ -79,10 +77,9 @@ export default function CalendarPage() {
       };
     }
   }, [date, projects, allTasks, viewMode]);
-
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full py-20">
+      <div className="flex justify-center items-center h-screen">
         <Loader />
       </div>
     );

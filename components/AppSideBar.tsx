@@ -43,7 +43,7 @@ export default function AppSidebar({
   const items = React.useMemo(
     () => [
       { title: "Home", url: "/Home", icon: IoHomeOutline },
-      { title: "Projects", url: "/allprojects", icon: FolderOpen },
+      { title: "Projects", url: "/projects", icon: FolderOpen },
       {
         title: "Schedule",
         url: "/schedule",

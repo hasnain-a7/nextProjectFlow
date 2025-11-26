@@ -167,7 +167,8 @@ export default function ProjectChatModal({ projectId }: { projectId: string }) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-5xl p-0 rounded-xl shadow-2xl border border-border/40">
+      {/* Changed max-w-5xl to dynamic width for mobile and added w-full */}
+      <DialogContent className="w-[95vw] sm:w-full md:max-w-5xl p-0 rounded-xl shadow-2xl border border-border/40">
         <DialogHeader className="p-4 border-b bg-linear-to-r from-muted/40 via-muted/20 to-muted/40 backdrop-blur">
           <div className="flex items-center justify-between">
             <div>
@@ -178,85 +179,98 @@ export default function ProjectChatModal({ projectId }: { projectId: string }) {
                 Collaborate and communicate with your team in real time.
               </DialogDescription>
             </div>
-            <Badge variant="outline" className="px-2 py-1  rounded-md">
+            <Badge variant="outline" className="px-2 py-1 rounded-md">
               Live
             </Badge>
           </div>
         </DialogHeader>
 
-        <div className="flex h-[65vh]">
+        {/* Changed layout from flex row to flex-col on mobile, flex-row on desktop */}
+        <div className="flex flex-col md:flex-row h-[80vh] md:h-[65vh]">
           {loading ? (
-            <div className="flex justify-center px-[480px] items-center">
+            // Fixed the hardcoded padding px-[480px] to flexible center
+            <div className="flex w-full h-full justify-center items-center">
               <Loader />
             </div>
           ) : (
             <>
               {/* Participants Sidebar */}
-              <div className="w-1/3 border-r bg-muted/10 flex flex-col">
-                <div className="p-4 border-b">
+              {/* Added h-auto with max-height on mobile to prevent taking up full screen, normal width on desktop */}
+              <div className="w-full md:w-1/3 h-auto max-h-[120px] md:max-h-full border-b md:border-b-0 md:border-r bg-muted/10 flex flex-col">
+                <div className="p-3 md:p-4 border-b hidden md:block">
                   <h3 className="font-semibold text-sm uppercase text-muted-foreground">
                     Participants
                   </h3>
                 </div>
 
-                <ScrollArea className="flex-1 p-4 space-y-2">
-                  {userData && (
-                    <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/20 border border-transparent hover:border-border transition cursor-pointer">
-                      <Avatar className="w-9 h-9 border">
-                        {userData.avatar ? (
-                          <AvatarImage src={userData.avatar} />
-                        ) : (
-                          <AvatarFallback>
-                            {userData.fullname?.charAt(0).toUpperCase() || "U"}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                      <div className="flex items-center justify-between ">
-                        <p className="text-sm font-medium">
-                          {userData.fullname}
-                        </p>
-                      </div>
-                      <Badge variant="secondary" className="text-xs ml-auto">
-                        You
-                      </Badge>
-                    </div>
-                  )}
-
-                  <Separator className="my-3" />
-
-                  {assignedUsers.length > 0 ? (
-                    assignedUsers.map((userId, i) => {
-                      if (userId === userData?.id) return null;
-                      return (
-                        <div
-                          key={i}
-                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/30 transition cursor-pointer"
-                        >
-                          <Avatar className="w-9 h-9 border">
+                {/* Sidebar ScrollArea */}
+                <ScrollArea className="flex-1 p-2 h-min md:p-4 space-y-2">
+                  <div className="flex flex-row md:flex-col gap-2 md:gap-0 overflow-x-auto md:overflow-hidden">
+                    {userData && (
+                      <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/20 border border-transparent hover:border-border transition cursor-pointer min-w-[150px] md:min-w-0">
+                        <Avatar className="w-8 h-8 md:w-9 md:h-9 border">
+                          {userData.avatar ? (
+                            <AvatarImage src={userData.avatar} />
+                          ) : (
                             <AvatarFallback>
-                              {userId.charAt(0).toUpperCase()}
+                              {userData.fullname?.charAt(0).toUpperCase() ||
+                                "U"}
                             </AvatarFallback>
-                          </Avatar>
-                          <p className="text-sm font-medium">{userId}</p>
+                          )}
+                        </Avatar>
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium truncate max-w-20 md:max-w-none">
+                            {userData.fullname}
+                          </p>
                         </div>
-                      );
-                    })
-                  ) : (
-                    <p className="text-sm text-muted-foreground italic">
-                      No assigned members.
-                    </p>
-                  )}
+                        <Badge
+                          variant="secondary"
+                          className="text-xs ml-auto hidden md:inline-flex"
+                        >
+                          You
+                        </Badge>
+                      </div>
+                    )}
+
+                    <Separator className="hidden md:block my-3" />
+
+                    {assignedUsers.length > 0 ? (
+                      assignedUsers.map((userId, i) => {
+                        if (userId === userData?.id) return null;
+                        return (
+                          <div
+                            key={i}
+                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/30 transition cursor-pointer min-w-[150px] md:min-w-0"
+                          >
+                            <Avatar className="w-8 h-8 md:w-9 md:h-9 border">
+                              <AvatarFallback>
+                                {userId.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <p className="text-sm font-medium truncate max-w-[100px] md:max-w-none">
+                              {userId}
+                            </p>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic p-2 hidden md:block">
+                        No assigned members.
+                      </p>
+                    )}
+                  </div>
                 </ScrollArea>
               </div>
 
-              <div className="flex-1  flex flex-col bg-background">
+              {/* Chat Area - Added flex-1 and min-h-0 to handle flex scrolling correctly */}
+              <div className="flex-1 flex flex-col bg-background ">
                 <ScrollArea
                   ref={scrollContainerRef}
-                  className="flex-1 h-[40vh] px-4 py-2"
+                  className="flex-1 px-4 py-2 h-[40vh]" // Removed fixed h-[40vh]
                 >
-                  <div className="space-y-2">
+                  <div className="space-y-4 pb-4">
                     {hasMore && (
-                      <div className="flex justify-center mb-3">
+                      <div className="flex justify-center mb-3 pt-2">
                         <Button
                           size="sm"
                           variant="outline"
@@ -278,7 +292,7 @@ export default function ProjectChatModal({ projectId }: { projectId: string }) {
                           }`}
                         >
                           <div
-                            className={`max-w-[75%] p-3 rounded-2xl shadow-sm border ${
+                            className={`max-w-[85%] md:max-w-[75%] p-3 rounded-2xl shadow-sm border ${
                               isUser
                                 ? "bg-blue-600 text-white rounded-br-none"
                                 : "bg-muted text-foreground rounded-bl-none"
@@ -287,15 +301,21 @@ export default function ProjectChatModal({ projectId }: { projectId: string }) {
                             <div className="flex items-center gap-2 mb-1">
                               <Avatar className="w-6 h-6 border">
                                 <AvatarImage src={msg.senderPhoto} />
-                                <AvatarFallback>
+                                <AvatarFallback className="text-black dark:text-white">
                                   {msg.senderName?.charAt(0)?.toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
-                              <span className="text-xs opacity-80 font-medium">
+                              <span
+                                className={`text-xs font-medium ${
+                                  isUser
+                                    ? "text-blue-100"
+                                    : "text-muted-foreground"
+                                }`}
+                              >
                                 {msg.senderName}
                               </span>
                             </div>
-                            <p className="text-sm leading-relaxed">
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word">
                               {msg.text}
                             </p>
                           </div>
@@ -318,7 +338,7 @@ export default function ProjectChatModal({ projectId }: { projectId: string }) {
                         {userData?.fullname || "You"} are typing...
                       </p>
                     )}
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                       <Input
                         placeholder="Type your message..."
                         value={message}
@@ -329,12 +349,13 @@ export default function ProjectChatModal({ projectId }: { projectId: string }) {
                       <Button
                         type="submit"
                         disabled={!message.trim() || sending}
-                        className="rounded-full px-6 flex items-center gap-2"
+                        className="rounded-full px-4 md:px-6 flex items-center gap-2"
                       >
-                        {sending && (
+                        {sending ? (
                           <Loader2 className="animate-spin w-4 h-4 text-white" />
+                        ) : (
+                          "Send"
                         )}
-                        {sending ? "Sending..." : "Send"}
                       </Button>
                     </div>
                   </form>

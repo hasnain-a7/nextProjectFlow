@@ -66,7 +66,7 @@ export default function Navbar() {
             {["Features", "About", "Pricing", "Testimonials"].map((item) => (
               <Link
                 key={item}
-                href={`#${item.toLowerCase()}`}
+                href={`${item.toLowerCase()}`}
                 className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
               >
                 {item}

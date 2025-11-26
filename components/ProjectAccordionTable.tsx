@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { Plus, Users, Tag, Layers, ListCheck, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
