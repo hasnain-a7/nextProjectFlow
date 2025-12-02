@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Providers } from "./providers";
 import "./globals.css";
-
 export const metadata: Metadata = {
   title: {
     default: "Project Flow - Manage Projects Efficiently",
@@ -64,7 +63,6 @@ export const metadata: Metadata = {
     canonical: "https://project.hasnain.site",
   },
 };
-
 export default function RootLayout({
   children,
 }: {
