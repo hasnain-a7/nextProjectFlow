@@ -31,11 +31,7 @@ import {
 } from "@/components/ui/pagination";
 import { AiFeatureCard } from "@/components/AiFeaturedCard";
 import { QuickNoteCard } from "@/components/QuickNoteCard";
-
-// 1. LAZY LOAD: Only import the Modal when needed to save initial bundle size
 const ProjectModol = lazy(() => import("@/components/modols/ProjectModol"));
-
-// 2. ANIMATION VARIANTS: Define the staggered entrance
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -46,7 +42,6 @@ const containerVariants = {
     },
   },
 };
-
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   show: {
@@ -60,10 +55,8 @@ const itemVariants: Variants = {
 const HomePage = () => {
   const { projects, loading } = useProjectContext();
   const navigate = useRouter();
-
   const [searchTerm, setSearchTerm] = useState("");
   const deferredSearch = useDeferredValue(searchTerm);
-
   const [filter, setFilter] = useState<"all" | "recent" | "lastupdated">("all");
   const [filteredCategory, setFilteredCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -139,11 +132,9 @@ const HomePage = () => {
   const { totalTasks, latestTasks } = useMemo(() => {
     let total = 0;
     const allTasks: (Task & { projectId: string; projectTitle: string })[] = [];
-
     projects.forEach((project) => {
       const tasks = project.Tasks || [];
       total += tasks.length;
-
       tasks.forEach((task) => {
         if (task.updatedAt) {
           allTasks.push({
@@ -169,23 +160,20 @@ const HomePage = () => {
     };
   }, [projects]);
 
-  const handleProjectClick = (id: string) => navigate.push(`/projects/${id}`);
-  const handleCategoryProject = (value: string) =>
+  const handleCategoryProject = (value: string) => {
     setFilteredCategory(value === "all" ? "" : value);
+  };
 
   const { currentProjects, totalPages } = useMemo(() => {
     const projectsPerPage = 8;
     const total = Math.ceil(filteredProjects.length / projectsPerPage);
-
     const sorted = [...filteredProjects].sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-
     const indexOfLastProject = currentPage * projectsPerPage;
     const indexOfFirstProject = indexOfLastProject - projectsPerPage;
     const current = sorted.slice(indexOfFirstProject, indexOfLastProject);
-
     return { currentProjects: current, totalPages: total };
   }, [filteredProjects, currentPage]);
 
@@ -194,6 +182,8 @@ const HomePage = () => {
       setFilter(value);
     }
   };
+
+  const handleProjectClick = (id: string) => navigate.push(`/projects/${id}`);
 
   if (loading) {
     return (
@@ -211,7 +201,7 @@ const HomePage = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-1"
+            className=""
           >
             <div className="grid px-0.5  auto-rows-min gap-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
               <StatsCard
@@ -254,7 +244,7 @@ const HomePage = () => {
                     />
                     <Input
                       type="text"
-                      placeholder="Search..."
+                      placeholder="Search Projects"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10 pr-8 py-1 text-sm"
