@@ -124,7 +124,7 @@ export default function Navbar() {
           <Button
             variant="secondary"
             className="w-full justify-start"
-            onClick={() => router.push("/Login")}
+            onClick={() => router.push("/SignIn")}
           >
             Sign In
           </Button>

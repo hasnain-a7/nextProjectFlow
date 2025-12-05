@@ -19,7 +19,7 @@ export const StatsCard = ({
   return (
     <Card
       className={cn(
-        "rounded-2xl shadow-md overflow-hidden transition-transform hover:scale-[1.01] duration-300",
+        "rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.01] duration-300",
         color
       )}
     >
@@ -30,7 +30,7 @@ export const StatsCard = ({
           </h3>
           {Icon && (
             <div className="p-1.5 sm:p-2 bg-white/20 rounded-full">
-              <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
+              <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             </div>
           )}
         </div>

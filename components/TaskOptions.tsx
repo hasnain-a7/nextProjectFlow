@@ -17,6 +17,7 @@ import { useUserContextId } from "@/app/context/AuthContext";
 interface ProjectOptionsProps {
   currentProjectDetails: Project;
 }
+import { toast } from "sonner";
 
 const ProjectOptions = ({ currentProjectDetails }: ProjectOptionsProps) => {
   const navigate = useRouter();
@@ -29,7 +30,9 @@ const ProjectOptions = ({ currentProjectDetails }: ProjectOptionsProps) => {
 
   const handleDelete = (projectId: string) => {
     console.log(`Deleting project with ID: ${projectId}`);
+
     deleteProject(projectId);
+    toast.warning("Project deleted successfully.");
     navigate.push(`/Home`);
   };
   const isUser = currentProjectDetails?.userId === userContextId;

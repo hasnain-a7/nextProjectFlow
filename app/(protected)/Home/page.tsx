@@ -237,18 +237,23 @@ const HomePage = () => {
               <div className="flex flex-col gap-2">
                 {/* Header / Filter Section */}
                 <div className="flex flex-col md:flex-row lg:flex-row lg:items-center lg:justify-between w-full gap-2 pt-2 shadow-sm">
-                  <div className="relative flex items-center w-full sm:max-w-sm md:max-w-full lg:max-w-full xl:w-full">
+                  <div className="relative flex items-center w-full sm:max-w-sm md:max-w-md">
                     <Search
-                      className="absolute left-3 text-muted-foreground"
+                      className="absolute left-3 text-gray-400"
                       size={18}
                     />
+
                     <Input
                       type="text"
-                      placeholder="Search Projects"
+                      placeholder="Search projects..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-8 py-1 text-sm"
+                      className="pl-10 pr-14 py-2 rounded-lg border text-sm"
                     />
+
+                    <kbd className="absolute right-3 text-[12px]  px-1.5 py-0.5 rounded">
+                      ⌘ K
+                    </kbd>
                   </div>
 
                   <div className="flex items-center justify-start lg:justify-end gap-2 w-full lg:w-auto">
