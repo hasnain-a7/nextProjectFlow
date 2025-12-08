@@ -30,10 +30,10 @@ const LatestProject: React.FC<LatestProjectProps> = ({ LatestProjects }) => {
     .slice(0, 5);
 
   return (
-    <Card className="w-full overscroll-none pb-1 pt-1 min-h-min border border-border/50 rounded-lg mt-2 bg-card transition-all duration-300">
+    <Card className="w-full overscroll-none pb-1 pt-1 min-h-min border border-border/50 rounded-lg mt-1 bg-card transition-all duration-300">
       <CardHeader className="flex justify-between -ml-3">
-        <CardTitle className="text-sm">Recently Updated Projects</CardTitle>
-        <Badge variant="outline" className="text-xs -mr-3">
+        <CardTitle className="text-md">Recently Updated Projects</CardTitle>
+        <Badge variant="outline" className="text-sm -mr-3">
           {top5UpdatedProjects.length}
         </Badge>
       </CardHeader>

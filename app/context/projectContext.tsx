@@ -15,6 +15,7 @@ import {
   arrayRemove,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { toast } from "sonner";
 
 export interface User {
   id?: string;
@@ -300,6 +301,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({
         ...prev,
         { id: docRef.id, ...projectData, Tasks: [] },
       ]);
+      toast.success("Project Added successfully.", {
+        duration: 1000,
+      });
 
       return docRef.id;
     } catch (err) {
@@ -371,6 +375,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({
             : p
         )
       );
+      toast.success("Project Updated successfully.", {
+        duration: 1000,
+      });
 
       return true;
     } catch (err) {
@@ -437,7 +444,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({
           return project;
         })
       );
-
+      toast.success("Task Added to project successfully.", {
+        duration: 1000,
+      });
       return taskRef.id;
     } catch (err) {
       console.error("❌ Error adding task:", err);
@@ -520,6 +529,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({
           return project;
         })
       );
+      toast.success("Task updated project successfully.", {
+        duration: 1000,
+      });
     } catch (err) {
       console.error("❌ Error updating task:", err);
       throw err;

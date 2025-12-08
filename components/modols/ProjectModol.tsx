@@ -179,7 +179,7 @@ export default function ProjectModol({
         <DialogDescription className="text-sm text-muted-foreground">
           {ProjectToEdit
             ? "Update the project details below."
-            : "Fill out the information to create a new project."}
+            : "Fill out the information to create a new project. "}
         </DialogDescription>
       </DialogHeader>
 

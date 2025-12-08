@@ -15,7 +15,7 @@ const ProfilePage = () => {
   }
   return (
     <>
-      <div className="container mx-auto space-y-4  py-2">
+      <div className=" px-2 space-y-4  py-2">
         <ProfileHeader user={userData} />
         <ProfileContent />
       </div>

@@ -1,7 +1,14 @@
 "use client";
 import { useMemo, useState, useDeferredValue, lazy, Suspense } from "react";
 import { ProjectCard } from "@/components/ProjectCard";
-import { CheckCircle, Clock, FolderOpen, Search, Plus } from "lucide-react";
+import {
+  CheckCircle,
+  Clock,
+  FolderOpen,
+  Search,
+  Plus,
+  UserCheck2,
+} from "lucide-react";
 import { useProjectContext, Task, Project } from "@/app/context/projectContext";
 import { useRouter } from "next/navigation";
 import { StatsCard } from "@/components/StatsCard";
@@ -86,36 +93,45 @@ const HomePage = () => {
           new Date(a.updatedAt ?? 0).getTime()
       )[0];
   }, [projects]);
+  const filteredProjects = useMemo(
+    () => {
+      const q = (deferredSearch || "").trim().toLowerCase();
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
-      const titleMatch =
-        project.title ||
-        project.description
-          .toLowerCase()
-          .includes(deferredSearch.toLowerCase());
+      // if projects might be undefined/null, guard with empty array
+      return (projects || []).filter((project) => {
+        // normalize fields safely to avoid runtime errors
+        const title = (project.title || "").toLowerCase();
+        const description = (project.description || "").toLowerCase();
+        const category = (project.Category || "").toLowerCase();
 
-      const categoryMatch = filteredCategory
-        ? project.Category?.toLowerCase() === filteredCategory.toLowerCase()
-        : true;
+        // check if query is present; if not, title/description match is true
+        const titleMatch =
+          q === "" ? true : title.includes(q) || description.includes(q);
 
-      const dropdownMatch =
-        filter === "recent"
-          ? project.id === LatestProject?.id
-          : filter === "lastupdated"
-          ? project.id === LastUpdatedProject?.id
+        const categoryMatch = filteredCategory
+          ? category === filteredCategory.toLowerCase()
           : true;
 
-      return titleMatch && categoryMatch && dropdownMatch;
-    });
-  }, [
-    projects,
-    deferredSearch,
-    filteredCategory,
-    filter,
-    LatestProject,
-    LastUpdatedProject,
-  ]);
+        const dropdownMatch =
+          filter === "recent"
+            ? project.id === LatestProject?.id
+            : filter === "lastupdated"
+            ? project.id === LastUpdatedProject?.id
+            : true;
+
+        return titleMatch && categoryMatch && dropdownMatch;
+      });
+    },
+    // make sure you include all values used inside the memo
+    [
+      projects,
+      deferredSearch,
+      filteredCategory,
+      filter,
+      LatestProject,
+      LastUpdatedProject,
+    ]
+  );
 
   const Categories = useMemo(() => {
     const unique = new Set<string>();
@@ -213,7 +229,7 @@ const HomePage = () => {
               <StatsCard
                 title="Assigned Projects"
                 value={AssignedProjects?.length || 0}
-                icon={CheckCircle}
+                icon={UserCheck2}
                 color="bg-gradient-to-br from-violet-600 to-violet-700"
               />
               <StatsCard
@@ -237,18 +253,23 @@ const HomePage = () => {
               <div className="flex flex-col gap-2">
                 {/* Header / Filter Section */}
                 <div className="flex flex-col md:flex-row lg:flex-row lg:items-center lg:justify-between w-full gap-2 pt-2 shadow-sm">
-                  <div className="relative flex items-center w-full sm:max-w-sm md:max-w-full lg:max-w-full xl:w-full">
+                  <div className="relative flex items-center w-full sm:max-w-sm md:max-w-md">
                     <Search
-                      className="absolute left-3 text-muted-foreground"
+                      className="absolute left-3 text-gray-400"
                       size={18}
                     />
+
                     <Input
                       type="text"
-                      placeholder="Search Projects"
+                      placeholder="Search projects..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-8 py-1 text-sm"
+                      className="pl-10 pr-14 py-2 rounded-lg border text-sm"
                     />
+
+                    <kbd className="absolute right-3 text-[12px]  px-1.5 py-0.5 rounded">
+                      ⌘ K
+                    </kbd>
                   </div>
 
                   <div className="flex items-center justify-start lg:justify-end gap-2 w-full lg:w-auto">
@@ -468,7 +489,7 @@ const HomePage = () => {
             >
               <div className="flex flex-col sm:flex-col md:flex-row lg:flex-col">
                 <Card
-                  className="max-h-[392px] bg-background flex p-0 border-none flex-col 
+                  className="max-h-[392px]  bg-background flex p-0 border-none flex-col 
          w-full md:w-1/2 lg:w-full"
                 >
                   <CardHeader className="flex justify-between -ml-4">
