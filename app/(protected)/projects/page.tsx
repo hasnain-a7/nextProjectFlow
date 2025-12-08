@@ -31,13 +31,13 @@ const AssignProjects: React.FC = () => {
   return (
     <>
       <motion.main
-        className="relative min-h-screen overflow-hidden py-2 px-1"
+        className="relative min-h-screen overflow-hidden py-2 "
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
             <h1 className="text-2xl font-bold">Assign Projects</h1>
             <div className="flex gap-2 mt-3 md:mt-0">
               <Dialog>
