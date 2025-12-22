@@ -9,7 +9,7 @@ import {
   Plus,
   UserCheck2,
 } from "lucide-react";
-import { useProjectContext, Task, Project } from "@/app/context/projectContext";
+import { useProjectContext, Task } from "@/app/context/projectContext";
 import { useRouter } from "next/navigation";
 import { StatsCard } from "@/components/StatsCard";
 import LatestUpdatedTasks from "@/components/LatestUpdatedTasks";
@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/pagination";
 import { AiFeatureCard } from "@/components/AiFeaturedCard";
 import { QuickNoteCard } from "@/components/QuickNoteCard";
+import { LatestProjectSkeleton } from "@/components/Skeletons";
 const ProjectModol = lazy(() => import("@/components/modols/ProjectModol"));
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -134,15 +135,26 @@ const HomePage = () => {
   );
 
   const Categories = useMemo(() => {
-    const unique = new Set<string>();
-    const result: Project[] = [];
+    const counts: Record<string, { name: string; count: number }> = {};
+
     projects.forEach((p) => {
-      if (p.Category && !unique.has(p.Category)) {
-        unique.add(p.Category);
-        result.push(p);
+      if (!p.Category) return;
+
+      const clean = p.Category.trim().toLowerCase();
+
+      if (!counts[clean]) {
+        counts[clean] = {
+          name:
+            p.Category.trim().charAt(0).toUpperCase() +
+            p.Category.trim().slice(1).toLowerCase(),
+          count: 0,
+        };
       }
+
+      counts[clean].count += 1;
     });
-    return result;
+
+    return Object.values(counts);
   }, [projects]);
 
   const { totalTasks, latestTasks } = useMemo(() => {
@@ -298,9 +310,17 @@ const HomePage = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Categories</SelectItem>
+
                         {Categories.map((c) => (
-                          <SelectItem key={c.id} value={c.Category}>
-                            {c.Category}
+                          <SelectItem
+                            key={c.name}
+                            value={c.name}
+                            className="flex items-center justify-between gap-3 px-2 py-1"
+                          >
+                            <span className="font-medium">{c.name}</span>
+                            <span className="text-muted-foreground text-sm">
+                              ({c.count})
+                            </span>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -497,13 +517,13 @@ const HomePage = () => {
                   </CardHeader>
 
                   {projects.length > 0 && (
-                    <Suspense fallback={<Loader />}>
-                      <LatestProjects LatestProjects={projects} />
+                    <Suspense fallback={<LatestProjectSkeleton />}>
+                      <LatestProjects />
                     </Suspense>
                   )}
                 </Card>
                 <div className="flex h-auto md:h-[200px] lg:h-auto flex-col gap-2 w-full md:w-1/2 lg:w-full  ">
-                  <Suspense fallback={<Loader />}>
+                  <Suspense fallback={<LatestProjectSkeleton />}>
                     <LatestUpdatedTasks latestTasks={latestTasks} />
                   </Suspense>
                 </div>

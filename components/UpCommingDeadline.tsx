@@ -3,12 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRouter } from "next/navigation";
 import { CalendarDays, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-type Project = {
-  id?: string;
-  title: string;
-  dueDate?: string;
-};
+import { Project } from "@/app/context/projectContext";
 
 export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
   const sorted = [...projects]
@@ -60,7 +55,7 @@ export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
                       {p.title}
                     </span>
                     <span className="text-[10px] text-muted-foreground">
-                      Project ID: {p.id?.slice(0, 4)}...
+                      Total Tasks: {p?.Tasks?.length}
                     </span>
                   </div>
 

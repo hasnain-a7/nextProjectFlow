@@ -2,25 +2,21 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-
+import { useProjectContext } from "@/app/context/projectContext";
 import { Badge } from "./ui/badge";
-import { Project } from "@/app/context/projectContext";
 import ProjectModol from "./modols/ProjectModol";
 import { useRouter } from "next/navigation";
 import { Edit } from "lucide-react";
 
-interface LatestProjectProps {
-  LatestProjects: Project[];
-}
-
-const LatestProject: React.FC<LatestProjectProps> = ({ LatestProjects }) => {
+const LatestProject: React.FC = () => {
+  const { projects } = useProjectContext();
   const navigate = useRouter();
   const handleNavigateToPage = (projectId: string | undefined) => {
     if (projectId) {
       navigate.push(`/projects/${projectId}`);
     }
   };
-  const top5UpdatedProjects = [...LatestProjects]
+  const top5UpdatedProjects = [...projects]
     .filter((p) => p.updatedAt)
     .sort(
       (a, b) =>

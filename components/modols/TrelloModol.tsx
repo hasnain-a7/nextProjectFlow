@@ -10,7 +10,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, Clock, Edit } from "lucide-react";
-
 import TodoModel from "./TaskModol";
 import { Task } from "@/app/context/projectContext";
 import Image from "next/image";
@@ -104,18 +103,19 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
           </div>
         </DialogHeader>
 
-        <Separator />
-
         {/* 🔹 Description */}
         {task.todo && (
-          <section className="space-y-2">
-            <h3 className="text-sm font-semibold text-muted-foreground">
-              Description
-            </h3>
-            <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
-              {task.todo}
-            </p>
-          </section>
+          <>
+            <Separator />
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-muted-foreground">
+                Description
+              </h3>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
+                {task.todo}
+              </p>
+            </section>
+          </>
         )}
 
         <Separator />

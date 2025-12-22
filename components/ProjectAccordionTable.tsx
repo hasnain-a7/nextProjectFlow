@@ -210,7 +210,7 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
                   <div className="hidden sm:grid grid-cols-12 gap-2 px-3 py-2 bg-muted/40 text-muted-foreground text-[11px] font-semibold uppercase rounded-t-2xl tracking-wide">
                     <div className="col-span-4">Name</div>
                     <div className="col-span-2 text-center">Priority</div>
-                    <div className="col-span-2 text-center">Due</div>
+                    <div className="col-span-2 text-center">Due Date</div>
                     <div className="col-span-2 text-center">Updated</div>
                     <div className="col-span-2 text-center">Created</div>
                   </div>

@@ -60,7 +60,6 @@ export interface Project {
   projectEmoji?: string;
   Tasks?: Task[];
 }
-
 interface ProjectContextType {
   projects: Project[];
   userData: User;
@@ -122,7 +121,6 @@ interface ProjectContextType {
   ) => Promise<boolean>;
   deleteProject: (projectId: string) => Promise<void>;
 }
-
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({

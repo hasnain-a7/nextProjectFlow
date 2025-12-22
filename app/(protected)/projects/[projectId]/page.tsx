@@ -17,13 +17,7 @@ const ProjectPage = () => {
   const { projects, loading } = useProjectContext();
   const project = projects.find((proj) => proj.id === projectId);
   const specificTasks = project?.Tasks ?? [];
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader />
-      </div>
-    );
-  }
+
   if (!project) {
     notFound();
   }
