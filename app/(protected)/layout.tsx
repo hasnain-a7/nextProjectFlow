@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useUserContextId } from "../context/AuthContext";
+import { useSession } from "next-auth/react";
 import Sidebar from "@/components/AppSideBar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import LayoutFooter from "@/components/LayoutFooter";
@@ -19,16 +19,16 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userContextId, loading } = useUserContextId();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !userContextId) {
+    if (status === "unauthenticated") {
       router.replace("/SignIn");
     }
-  }, [loading, userContextId, router]);
+  }, [status, router]);
 
-  if (loading) {
+  if (status === "loading") {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader />
@@ -36,13 +36,12 @@ export default function ProtectedLayout({
     );
   }
 
-  if (!userContextId) return null;
+  if (status === "unauthenticated") return null;
 
   return (
     <ThemeProvider defaultTheme="dark">
       <SidebarProvider defaultOpen={false}>
         <Sidebar />
-
         <SidebarInset>
           <header className="flex items-center justify-between border-b px-4 py-2 shadow-sm transition-all duration-200 ease-linear lg:hidden">
             <div className="flex items-center gap-3">
@@ -57,12 +56,12 @@ export default function ProtectedLayout({
             </div>
             <Avatar className="cursor-pointer hover:scale-105 transition-transform duration-200">
               <AvatarImage
-                src="/todo-list-svgrepo-com.svg"
+                src={session?.user?.image || "/todo-list-svgrepo-com.svg"}
                 alt="User Avatar"
                 className="h-8 w-8 p-1"
               />
               <AvatarFallback className="text-[13px] font-medium ">
-                U
+                {session?.user?.name?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
           </header>
