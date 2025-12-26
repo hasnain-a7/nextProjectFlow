@@ -1,10 +1,11 @@
 "use client";
-import { UserProvider } from "./context/AuthContext";
+
+import { SessionProvider } from "next-auth/react";
 import { ProjectProvider } from "./context/projectContext";
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <UserProvider>
+    <SessionProvider>
       <ProjectProvider>{children}</ProjectProvider>
-    </UserProvider>
+    </SessionProvider>
   );
 }

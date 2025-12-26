@@ -1,10 +1,10 @@
 "use server";
-
 import User from "@/models/User";
 import Project from "@/models/Project";
 import { connectDB } from "@/lib/db";
 import { UpdateQuery } from "mongoose";
-
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 export interface User {
   _id?: string;
   email: string;
@@ -35,11 +35,11 @@ export interface Task {
 export interface Project {
   _id?: string;
   title: string;
-  Category: string;
+  Category?: string;
   description: string;
   url?: string;
   userId?: string;
-  createdAt: string;
+  createdAt?: string;
   updatedAt?: string;
   attachments?: string[];
   dueDate?: string;
@@ -48,6 +48,12 @@ export interface Project {
   projectEmoji?: string;
   Tasks?: Task[];
 }
+export async function getUserId() {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?.id) throw new Error("Unauthorized");
+  return session.user.id;
+}
+
 export async function fetchUserData(userId: string) {
   try {
     await connectDB();
@@ -58,7 +64,6 @@ export async function fetchUserData(userId: string) {
     return null;
   }
 }
-
 export async function updateUserData(data: User) {
   try {
     await connectDB();
@@ -76,8 +81,6 @@ export async function updateUserData(data: User) {
     return null;
   }
 }
-
-// Delete user
 export async function deleteUserData(userId: string) {
   try {
     await connectDB();
@@ -88,10 +91,6 @@ export async function deleteUserData(userId: string) {
     return false;
   }
 }
-
-// ------------------- Project Functions -------------------
-
-// Fetch user projects
 export async function fetchUserProjects(userId: string) {
   try {
     await connectDB();
@@ -116,8 +115,6 @@ export async function fetchUserProjects(userId: string) {
     return [];
   }
 }
-
-// Add project
 export async function addProject(data: Project) {
   try {
     await connectDB();
@@ -128,8 +125,6 @@ export async function addProject(data: Project) {
     return "";
   }
 }
-
-// Update project
 export async function updateProject(
   projectId: string,
   data: Project,
@@ -152,8 +147,6 @@ export async function updateProject(
     return false;
   }
 }
-
-// Delete project
 export async function deleteProject(projectId: string) {
   try {
     await connectDB();
@@ -164,10 +157,6 @@ export async function deleteProject(projectId: string) {
     return false;
   }
 }
-
-// ------------------- Task Functions -------------------
-
-// Add task
 export async function addTaskToProject(projectId: string, task: Task) {
   try {
     await connectDB();
@@ -183,8 +172,6 @@ export async function addTaskToProject(projectId: string, task: Task) {
     return "";
   }
 }
-
-// Update task
 export async function updateTaskInProject(
   projectId: string,
   taskId: string,
@@ -207,7 +194,6 @@ export async function updateTaskInProject(
     return false;
   }
 }
-
 export async function deleteTaskFromProject(projectId: string, taskId: string) {
   try {
     await connectDB();

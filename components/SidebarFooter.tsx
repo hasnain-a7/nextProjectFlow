@@ -7,9 +7,9 @@ import {
 import { FaSignOutAlt } from "react-icons/fa";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { useRouter } from "next/navigation";
-import { useUserContextId } from "@/app/context/AuthContext";
 
 import { useProjectContext } from "@/app/context/projectContext";
+import { signOut } from "next-auth/react";
 
 interface SidebarFooterProps {
   setopen: (open: boolean) => void;
@@ -18,13 +18,13 @@ interface SidebarFooterProps {
 
 const SidebarFooter: React.FC<SidebarFooterProps> = ({ state }) => {
   const navigate = useRouter();
-  const { logout } = useUserContextId();
+
   const { userData } = useProjectContext();
 
   const handleLogout = async () => {
     const confirmDelete = window.confirm("Do you want to logout?");
     if (!confirmDelete) return;
-    logout();
+    signOut({ callbackUrl: "/Login" });
   };
 
   return (

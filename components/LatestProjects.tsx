@@ -2,20 +2,15 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { useProjectContext } from "@/app/context/projectContext";
 import { Badge } from "./ui/badge";
 import ProjectModol from "./modols/ProjectModol";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Edit } from "lucide-react";
+import { fetchUserProjects, getUserId } from "@/actions/serverAtctions";
+const LatestProject = async () => {
+  const userId = await getUserId();
+  const projects = await fetchUserProjects(userId);
 
-const LatestProject: React.FC = () => {
-  const { projects } = useProjectContext();
-  const navigate = useRouter();
-  const handleNavigateToPage = (projectId: string | undefined) => {
-    if (projectId) {
-      navigate.push(`/projects/${projectId}`);
-    }
-  };
   const top5UpdatedProjects = [...projects]
     .filter((p) => p.updatedAt)
     .sort(
@@ -26,7 +21,7 @@ const LatestProject: React.FC = () => {
     .slice(0, 5);
 
   return (
-    <Card className="w-full overscroll-none pb-1 pt-1 min-h-min border border-border/50 rounded-lg mt-1 bg-card transition-all duration-300">
+    <Card className="w-full pb-1 pt-1 min-h-min border border-border/50 rounded-lg mt-1 bg-card">
       <CardHeader className="flex justify-between -ml-3">
         <CardTitle className="text-md">Recently Updated Projects</CardTitle>
         <Badge variant="outline" className="text-sm -mr-3">
@@ -35,53 +30,44 @@ const LatestProject: React.FC = () => {
       </CardHeader>
 
       {top5UpdatedProjects.length > 0 ? (
-        <ScrollArea className="w-full   pr-1">
+        <ScrollArea className="w-full pr-1">
           <CardContent className="max-h-[198px] p-0 -mt-1">
-            <div className="flex flex-col  gap-2 p-1">
+            <div className="flex flex-col gap-2 p-1">
               {top5UpdatedProjects.map((project) => (
-                <Card
-                  key={project.id}
-                  onClick={() => handleNavigateToPage(project.id)}
-                  className="border rounded-md p-2 relative transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-md cursor-pointer"
+                <Link
+                  key={project._id}
+                  href={`/projects/${project._id}`}
+                  className="border rounded-md p-2 relative hover:-translate-y-1 hover:shadow-md transition cursor-pointer block"
                 >
-                  <CardContent className="p-0">
-                    <div className="relative flex justify-between items-start">
-                      <div>
-                        <p className="font-medium">{project.title}</p>
-                        {/* <p className="text-sm text-gray-500">
-                          Category: {project.Category || "N/A"}
-                        </p> */}
-                        <p className="text-xs text-gray-500">
-                          UpdatedAt:{" "}
-                          {new Date(
-                            project.updatedAt || ""
-                          ).toLocaleDateString()}
-                        </p>
-                        <p className="absolute bottom-0.5 right-1 text-xs text-gray-500">
-                          Status:{" "}
-                          {project.status &&
-                            project?.status.charAt(0).toUpperCase() +
-                              project?.status.slice(1)}
-                        </p>
-                      </div>
+                  <div className="relative flex justify-between items-start">
+                    <div>
+                      <p className="font-medium">{project.title}</p>
 
-                      <div className="flex gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Edit
-                              size={16}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                              className="text-muted-foreground hover:text-primary cursor-pointer"
-                            />
-                          </DialogTrigger>
-                          <ProjectModol ProjectToEdit={project} />
-                        </Dialog>
-                      </div>
+                      <p className="text-xs text-gray-500">
+                        UpdatedAt:{" "}
+                        {new Date(project.updatedAt || "").toLocaleDateString()}
+                      </p>
+
+                      <p className="absolute bottom-0.5 right-1 text-xs text-gray-500">
+                        Status:{" "}
+                        {project.status &&
+                          project.status.charAt(0).toUpperCase() +
+                            project.status.slice(1)}
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Edit
+                          size={16}
+                          onClick={(e) => e.preventDefault()}
+                          className="text-muted-foreground hover:text-primary"
+                        />
+                      </DialogTrigger>
+                      <ProjectModol ProjectToEdit={project} />
+                    </Dialog>
+                  </div>
+                </Link>
               ))}
             </div>
           </CardContent>
@@ -94,5 +80,4 @@ const LatestProject: React.FC = () => {
     </Card>
   );
 };
-
 export default LatestProject;
