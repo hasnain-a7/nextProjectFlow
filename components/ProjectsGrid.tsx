@@ -1,6 +1,6 @@
+import { Project } from "@/actions/serverAtctions";
 import { ProjectCard } from "@/components/ProjectCard";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { fetchUserProjects, getUserId } from "@/actions/serverAtctions";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -23,10 +23,12 @@ interface StreamingProjectsGridProps {
 export async function StreamingProjectsGrid({
   handleProjectClick,
 }: StreamingProjectsGridProps) {
-  const userId = await getUserId();
-  const projects = await fetchUserProjects(userId);
+  const res = await fetch(`/api/projects`, {
+    cache: "no-store", // ensures fresh data each request
+  });
+  const projects = await res.json();
 
-  if (!projects || projects.length === 0) {
+  if (!projects || projects.length <= 0) {
     return (
       <motion.p
         initial={{ opacity: 0 }}
@@ -46,9 +48,9 @@ export async function StreamingProjectsGrid({
       animate="show"
     >
       <AnimatePresence mode="popLayout">
-        {projects.map((project) => (
+        {projects.map((project: Project) => (
           <motion.div
-            key={project.id}
+            key={project._id}
             layout
             variants={itemVariants}
             initial="hidden"

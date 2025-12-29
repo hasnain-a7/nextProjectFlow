@@ -3,9 +3,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRouter } from "next/navigation";
 import { CalendarDays, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Project } from "@/app/context/projectContext";
-
-export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
+import { Project } from "@/actions/serverAtctions";
+export function UpcomingDeadlines({ projects }: { projects: Project }) {
   const sorted = [...projects]
     .filter((p) => p.dueDate)
     .sort(
@@ -46,8 +45,8 @@ export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
             {sorted.length > 0 ? (
               sorted.map((p) => (
                 <div
-                  key={p.id}
-                  onClick={() => handleProjectClick(p?.id || "")}
+                  key={p._id}
+                  onClick={() => handleProjectClick(p?._id || "")}
                   className="group flex items-center justify-between text-sm px-3 py-2 rounded-md cursor-pointer transition-all duration-200 hover:bg-muted/80 hover:scale-[1.02]"
                 >
                   <div className="flex flex-col gap-0.5 max-w-[70%]">

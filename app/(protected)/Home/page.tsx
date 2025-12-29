@@ -1,17 +1,30 @@
+import { Project } from "@/actions/serverAtctions";
 import HomeClient from "./_components/HomeClient";
-import { fetchUserProjects, getUserId } from "@/actions/serverAtctions";
 import { StatsSection } from "./_components/StatsSection";
 
 export default async function HomePage() {
-  const userId = await getUserId();
-  const projects = await fetchUserProjects(userId);
+  const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
 
-  // Calculate static stats on the server
+  let projects = [];
+
+  try {
+    const res = await fetch(`${baseUrl}/api/projects`, { cache: "no-store" });
+    projects = await res.json();
+  } catch (err) {
+    console.error("Failed to fetch projects:", err);
+  }
+
+  // Calculate static stats safely
   const stats = {
     totalProjects: projects.length,
-    assignedProjects: projects.filter((p) => p.assignedUsers?.length).length,
-    activeProjects: projects.filter((p) => p.status === "active").length,
-    totalTasks: projects.reduce((sum, p) => sum + (p.tasks?.length || 0), 0),
+    assignedProjects: projects.filter((p: Project) => p.assignedUsers?.length)
+      .length,
+    activeProjects: projects.filter((p: Project) => p.status === "active")
+      .length,
+    totalTasks: projects.reduce(
+      (sum: number, p: Project) => sum + (p.Tasks?.length || 0),
+      0
+    ),
   };
 
   const latestProject = [...projects].sort(
@@ -29,10 +42,7 @@ export default async function HomePage() {
   return (
     <div className="h-full p-1 bg-background md:p-1 md:overflow-hidden">
       <main className="w-full mx-auto pt-1 flex-1">
-        {/* Static Stats Section - Server Component */}
         <StatsSection stats={stats} />
-
-        {/* Interactive Parts - Client Component */}
         <HomeClient
           initialProjects={projects}
           latestProject={latestProject}

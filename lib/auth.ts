@@ -3,7 +3,8 @@ import Credentials from "next-auth/providers/credentials";
 import { connectDB } from "./db";
 import { comparePassword } from "./password";
 import User from "../models/User";
-
+import { AuthOptions } from "next-auth";
+import { getServerSession } from "next-auth/next";
 export const authOptions = {
   providers: [
     Credentials({
@@ -53,3 +54,9 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   debug: true,
 };
+
+export async function getAuthUserId() {
+  const session = await getServerSession(authOptions as AuthOptions);
+  if (!session?.user?.id) throw new Error("Unauthorized");
+  return session.user.id;
+}

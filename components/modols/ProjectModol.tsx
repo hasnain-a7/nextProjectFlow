@@ -22,7 +22,6 @@ import DatePicker from "../DatePicker";
 import { Separator } from "../ui/separator";
 import Image from "next/image";
 import EmojiInput from "../EmojiInput";
-import { addProject, updateProject } from "@/actions/serverAtctions";
 
 type ProjectToEdit = {
   _id?: string;
@@ -93,7 +92,6 @@ export default function ProjectModal({
       });
     }
   }, [ProjectToEdit]);
-
   const handleSubmit = async () => {
     const requiredFields = [
       { field: "title", label: "Project Title" },
@@ -116,14 +114,28 @@ export default function ProjectModal({
     setLoading(true);
     try {
       if (ProjectToEdit?._id) {
-        await updateProject(
-          ProjectToEdit._id,
-          formData,
-          formData.assignedUsers,
-          deletedUserIds
-        );
+        // Update project via API
+        const res = await fetch("${process.env.NEXTAUTH_URL}/api/projects", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            projectId: ProjectToEdit._id,
+            updateData: formData,
+            assignedUsers: formData.assignedUsers,
+            deletedUsers: deletedUserIds,
+          }),
+        });
+        const result = await res.json();
+        if (!result.success) throw new Error(result.error);
       } else {
-        await addProject(formData);
+        // Add new project via API
+        const res = await fetch("${process.env.NEXTAUTH_URL}/api/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        const result = await res.json();
+        if (!result.success) throw new Error(result.error);
       }
 
       setFormData({

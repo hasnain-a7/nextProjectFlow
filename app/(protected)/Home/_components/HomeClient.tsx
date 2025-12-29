@@ -15,7 +15,7 @@ import { motion, Variants } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import Loader from "@/components/Loader";
+
 import { UpcomingDeadlines } from "@/components/UpCommingDeadline";
 import LatestProjects from "@/components/LatestProjects";
 import LatestUpdatedTasks from "@/components/LatestUpdatedTasks";
@@ -62,7 +62,7 @@ export default function HomeClient({
   const filteredProjects = useMemo(() => {
     const q = (deferredSearch || "").trim().toLowerCase();
 
-    return (initialProjects || []).filter((project) => {
+    return (initialProjects || [])?.filter((project) => {
       const title = (project.title || "").toLowerCase();
       const description = (project.description || "").toLowerCase();
       const category = (project.Category || "").toLowerCase();
@@ -198,22 +198,13 @@ export default function HomeClient({
                     <span className="md:hidden">Project</span>
                   </Button>
                 </DialogTrigger>
-                <Suspense
-                  fallback={
-                    <div className="p-4">
-                      <Loader />
-                    </div>
-                  }
-                ></Suspense>
+                <ProjectModol />
               </Dialog>
             </div>
           </div>
 
           <Suspense fallback={<ProjectsGridSkeleton count={8} />}>
-            <StreamingProjectsGrid
-              projects={filteredProjects}
-              handleProjectClick={handleProjectClick}
-            />
+            <StreamingProjectsGrid handleProjectClick={handleProjectClick} />
           </Suspense>
 
           {initialProjects && (
