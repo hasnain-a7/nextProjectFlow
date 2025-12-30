@@ -27,7 +27,7 @@ type ProjectToEdit = {
   _id?: string;
   title: string;
   description: string;
-  Category?: string;
+  category?: string;
   attachments?: string[];
   dueDate?: string;
   status?: string;
@@ -48,7 +48,7 @@ export default function ProjectModal({
   const [formData, setFormData] = useState<ProjectToEdit>({
     title: "",
     description: "",
-    Category: "",
+    category: "",
     attachments: [],
     dueDate: "",
     status: "backlog",
@@ -83,7 +83,7 @@ export default function ProjectModal({
         title: ProjectToEdit.title,
         description: ProjectToEdit.description || "",
         attachments: ProjectToEdit.attachments || [],
-        Category: ProjectToEdit.Category || "",
+        category: ProjectToEdit.category || "",
         _id: ProjectToEdit._id,
         dueDate: ProjectToEdit.dueDate || "",
         status: ProjectToEdit.status || "",
@@ -96,7 +96,7 @@ export default function ProjectModal({
     const requiredFields = [
       { field: "title", label: "Project Title" },
       { field: "description", label: "Description" },
-      { field: "Category", label: "Category" },
+      { field: "category", label: "category" },
       { field: "dueDate", label: "Due Date" },
       { field: "status", label: "Status" },
     ];
@@ -113,36 +113,43 @@ export default function ProjectModal({
 
     setLoading(true);
     try {
+      const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects`;
+      let result;
+
       if (ProjectToEdit?._id) {
-        // Update project via API
-        const res = await fetch("${process.env.NEXTAUTH_URL}/api/projects", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            projectId: ProjectToEdit._id,
-            updateData: formData,
-            assignedUsers: formData.assignedUsers,
-            deletedUsers: deletedUserIds,
-          }),
-        });
-        const result = await res.json();
-        if (!result.success) throw new Error(result.error);
+        // Update existing project
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${ProjectToEdit._id}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              projectId: ProjectToEdit._id,
+              updateData: formData,
+              assignedUsers: formData.assignedUsers,
+              deletedUsers: deletedUserIds,
+            }),
+          }
+        );
+        result = await res.json();
       } else {
-        // Add new project via API
-        const res = await fetch("${process.env.NEXTAUTH_URL}/api/projects", {
+        // Create new project
+        const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
-        const result = await res.json();
-        if (!result.success) throw new Error(result.error);
+        result = await res.json();
       }
 
+      if (!result.success) throw new Error(result.error || "API Error");
+
+      // Reset form
       setFormData({
         title: "",
         description: "",
         attachments: [],
-        Category: "",
+        category: "",
         dueDate: "",
         status: "backlog",
         assignedUsers: [],
@@ -271,9 +278,9 @@ export default function ProjectModal({
       <div className="grid sm:grid-cols-2 md:grid-cols-5 gap-2">
         <Input
           placeholder="Category"
-          value={formData.Category}
+          value={formData.category}
           onChange={(e) =>
-            setFormData({ ...formData, Category: e.target.value })
+            setFormData({ ...formData, category: e.target.value })
           }
         />
 

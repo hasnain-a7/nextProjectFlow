@@ -1,15 +1,16 @@
-import { Project } from "@/actions/serverAtctions";
+import { fetchUserProjects } from "@/actions/serverAtctions";
 import HomeClient from "./_components/HomeClient";
 import { StatsSection } from "./_components/StatsSection";
-
+import { getAuthUserId } from "@/lib/auth";
+import { Project } from "@/types/types";
+export const dynamic = "force-dynamic";
 export default async function HomePage() {
-  const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+  const userId = await getAuthUserId();
 
   let projects = [];
 
   try {
-    const res = await fetch(`${baseUrl}/api/projects`, { cache: "no-store" });
-    projects = await res.json();
+    projects = await fetchUserProjects(userId);
   } catch (err) {
     console.error("Failed to fetch projects:", err);
   }

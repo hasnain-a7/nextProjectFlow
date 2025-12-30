@@ -13,7 +13,6 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db } from "@/app/config/Firebase";
-import { useUserContextId } from "@/app/context/AuthContext";
 import {
   Dialog,
   DialogTrigger,

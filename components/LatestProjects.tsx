@@ -1,22 +1,24 @@
 import React from "react";
+import { Project } from "@/types/types";
+import { fetchUserProjects } from "@/actions/serverAtctions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "./ui/badge";
 import ProjectModol from "./modols/ProjectModol";
 import Link from "next/link";
+import { getAuthUserId } from "@/lib/auth";
 import { Edit } from "lucide-react";
+
 const LatestProject = async () => {
-  const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+  const userId = await getAuthUserId();
 
-  let projects = [];
+  let projects: Project[] = [];
 
-  try {
-    const res = await fetch(`${baseUrl}/api/projects`, { cache: "no-store" });
-    projects = await res.json();
-  } catch (err) {
-    console.error("Failed to fetch projects:", err);
+  if (userId) {
+    projects = await fetchUserProjects(userId);
   }
+
   const top5UpdatedProjects = [...projects]
     .filter((p) => p.updatedAt)
     .sort(
@@ -66,7 +68,6 @@ const LatestProject = async () => {
                       <DialogTrigger asChild>
                         <Edit
                           size={16}
-                          onClick={(e) => e.preventDefault()}
                           className="text-muted-foreground hover:text-primary"
                         />
                       </DialogTrigger>
@@ -86,4 +87,5 @@ const LatestProject = async () => {
     </Card>
   );
 };
+
 export default LatestProject;

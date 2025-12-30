@@ -13,7 +13,7 @@ import { FaEdit } from "react-icons/fa";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProjectModol from "./modols/ProjectModol";
 import { useProjectContext, Project } from "@/app/context/projectContext";
-import { useUserContextId } from "@/app/context/AuthContext";
+
 interface ProjectOptionsProps {
   currentProjectDetails: Project;
 }
@@ -22,8 +22,6 @@ import { toast } from "sonner";
 const ProjectOptions = ({ currentProjectDetails }: ProjectOptionsProps) => {
   const navigate = useRouter();
   const { deleteProject } = useProjectContext();
-  const { userContextId } = useUserContextId();
-
   const handleTrelloLink = (projectId: string) => {
     navigate.push(`/dashboard/${projectId}`);
   };
@@ -35,7 +33,7 @@ const ProjectOptions = ({ currentProjectDetails }: ProjectOptionsProps) => {
     toast.warning("Project deleted successfully.");
     navigate.push(`/Home`);
   };
-  const isUser = currentProjectDetails?.userId === userContextId;
+  const isUser = currentProjectDetails?.userId === userContextId || false;
 
   return (
     <DropdownMenu>

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useProjectContext, Task } from "@/app/context/projectContext";
 import {

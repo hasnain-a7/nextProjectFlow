@@ -5,6 +5,7 @@ import TaskModol from "./modols/TaskModol";
 import TaskDetailModal from "./modols/TrelloModol";
 import { Badge } from "./ui/badge";
 import { Edit, Info } from "lucide-react";
+import { Project, Task } from "@/types/types";
 
 const LatestUpdatedTasks = async () => {
   const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
@@ -18,7 +19,7 @@ const LatestUpdatedTasks = async () => {
     console.error("Failed to fetch projects:", err);
   }
   // Extract all tasks with project info
-  const allTasks = projects.flatMap((project) =>
+  const allTasks = projects.flatMap((project: Project) =>
     (project.Tasks || []).map((task: Task) => ({
       ...task,
       projectTitle: project.title,
@@ -47,7 +48,7 @@ const LatestUpdatedTasks = async () => {
         <ScrollArea className="w-full pr-1">
           <CardContent className="max-h-[350px] p-0 -mt-1">
             <div className="flex flex-col gap-2 p-1">
-              {latestTasks.map((task) => (
+              {latestTasks.map((task: Task) => (
                 <Card
                   key={task._id}
                   className="border rounded-md p-2 relative transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-md cursor-pointer"
@@ -57,7 +58,7 @@ const LatestUpdatedTasks = async () => {
                       <div>
                         <p className="font-medium">{task.title}</p>
                         <p className="text-sm text-gray-500">
-                          Project: {task.projectTitle}
+                          Project: {task.title}
                         </p>
                         <p className="text-xs text-gray-500">
                           UpdatedAt:{" "}

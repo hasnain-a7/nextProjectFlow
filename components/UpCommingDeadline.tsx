@@ -1,9 +1,10 @@
+"use client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { CalendarDays, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Project } from "@/actions/serverAtctions";
+import { Project } from "@/types/types";
 export function UpcomingDeadlines({ projects }: { projects: Project }) {
   const sorted = [...projects]
     .filter((p) => p.dueDate)
@@ -13,9 +14,8 @@ export function UpcomingDeadlines({ projects }: { projects: Project }) {
     )
     .slice(0, 3);
 
-  const navigate = useRouter();
-  const handleProjectClick = (id: string) => navigate.push(`/projects/${id}`);
-  const handleScheduleClick = () => navigate.push(`/schedule`);
+  const handleProjectClick = (id: string) => redirect(`/projects/${id}`);
+  const handleScheduleClick = () => redirect(`/schedule`);
 
   return (
     <Card className="w-full h-full flex flex-col bg-card hover:border-primary/50 transition-colors duration-300">
