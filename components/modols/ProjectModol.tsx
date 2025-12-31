@@ -22,7 +22,7 @@ import DatePicker from "../DatePicker";
 import { Separator } from "../ui/separator";
 import Image from "next/image";
 import EmojiInput from "../EmojiInput";
-
+import { useRouter } from "next/navigation";
 type ProjectToEdit = {
   _id?: string;
   title: string;
@@ -57,7 +57,7 @@ export default function ProjectModal({
   });
   const [deletedUserIds, setDeletedUserIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   const statusOptions = useMemo(
     () => [
       "pending",
@@ -157,6 +157,7 @@ export default function ProjectModal({
       });
 
       if (onClose) onClose();
+      router.refresh();
     } catch (error) {
       console.error("Error saving project:", error);
       alert("An error occurred while saving the project.");

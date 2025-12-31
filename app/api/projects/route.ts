@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Project from "@/models/Project";
 import { getAuthUserId } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   try {
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
       userId,
       assignedUsers: body.assignedUsers || [],
     });
-
+    revalidatePath("/Home");
     return NextResponse.json({ success: true, id: project._id.toString() });
   } catch (error) {
     console.error("POST /api/projects error:", error);

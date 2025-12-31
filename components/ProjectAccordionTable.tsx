@@ -3,7 +3,7 @@ import { Plus, Users, Tag, Layers, ListCheck, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useProjectContext, Task } from "@/app/context/projectContext";
+import { Task } from "@/app/context/projectContext";
 import {
   Accordion,
   AccordionContent,
@@ -16,19 +16,19 @@ import TaskModol from "./modols/TaskModol";
 import ProjectOptions from "./TaskOptions";
 import Image from "next/image";
 import ProjectChatModal from "./modols/ProjectChatModal";
+import { Project } from "@/types/types";
+import { getAuthUserId } from "@/lib/auth";
 interface TaskAccordionTableProps {
   tasks: Task[];
-  loading: boolean;
-  projectId: string | undefined;
+  project: Project;
 }
 
-const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
+const TaskAccordionTable: React.FC<TaskAccordionTableProps> = async ({
   tasks,
-  loading,
-  projectId,
+  project,
 }) => {
-  const { projects } = useProjectContext();
-  const specifictaskdata = projects.find((project) => project.id === projectId);
+  const specifictaskdata = project;
+  const session = await getAuthUserId();
 
   const getPriorityInfo = (dueDate: string) => {
     const today = new Date();
@@ -119,22 +119,23 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
             </h5>
           </div>
 
-          {!loading && (
-            <div className="flex gap-1 ml-auto  md:ml-0 lg:ml-0">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="cursor-pointer">
-                    <Plus className="h-4 w-4" />
-                    <span className="hidden md:block">Add Task</span>
-                  </Button>
-                </DialogTrigger>
+          <div className="flex gap-1 ml-auto  md:ml-0 lg:ml-0">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="cursor-pointer">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden md:block">Add Task</span>
+                </Button>
+              </DialogTrigger>
 
-                <TaskModol projectId={projectId} />
-              </Dialog>
+              <TaskModol projectId={specifictaskdata?._id} />
+            </Dialog>
 
-              <ProjectOptions currentProjectDetails={specifictaskdata!} />
-            </div>
-          )}
+            <ProjectOptions
+              currentProjectDetails={specifictaskdata}
+              userId={session}
+            />
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -182,7 +183,7 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
           </div>
         </div>
         <div className="fixed bottom-8 right-4 z-50">
-          <ProjectChatModal projectId={projectId!} />
+          <ProjectChatModal projectId={specifictaskdata?._id || ""} />
         </div>
         <Accordion
           type="multiple"
@@ -224,7 +225,7 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
                         <div className="col-span-4 truncate">
                           <TaskDetailsAccordion
                             task={task}
-                            projectid={projectId ?? ""}
+                            projectid={specifictaskdata?._id || ""}
                           />
                         </div>
 
@@ -265,7 +266,7 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = ({
                       <div className="sm:hidden flex flex-col gap-2 px-2 text-sm">
                         <TaskDetailsAccordion
                           task={task}
-                          projectid={projectId ?? ""}
+                          projectid={specifictaskdata?._id ?? ""}
                         />
 
                         <div className="flex justify-between">

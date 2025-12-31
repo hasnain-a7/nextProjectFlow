@@ -14,7 +14,6 @@ import {
 import { LatestProjectSkeleton } from "@/components/Skeletons";
 import { Project } from "@/types/types";
 import HomeHeader from "./HomeHeader";
-import { redirect } from "next/navigation";
 
 interface DashboardClientProps {
   initialProjects: Project;

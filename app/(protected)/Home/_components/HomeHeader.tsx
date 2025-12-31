@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useDeferredValue, useMemo } from "react";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,85 +14,38 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProjectModal from "@/components/modols/ProjectModol";
-import { Project } from "@/types/types";
 
 export default function HomeHeader() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const deferredSearch = useDeferredValue(searchTerm);
-  const [filter, setFilter] = useState<"all" | "recent" | "lastupdated">("all");
-  const [filteredCategory, setFilteredCategory] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Fetch projects client-side
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch("/api/projects"); // your API endpoint
-        const data = await res.json();
-        setProjects(data);
-      } catch (err) {
-        console.error("Failed to fetch projects", err);
-      }
-    };
-    fetchProjects();
-  }, []);
+  // Internal state for input (fast typing)
+  const [searchInput, setSearchInput] = useState("");
 
-  const filteredProjects = useMemo(() => {
-    const q = (deferredSearch || "").trim().toLowerCase();
-    let filtered = [...projects];
-
-    if (filter === "recent") {
-      filtered = filtered.sort(
-        (a, b) =>
-          new Date(b.updatedAt || "").getTime() -
-          new Date(a.updatedAt || "").getTime()
-      );
-    }
-
-    if (filteredCategory) {
-      filtered = filtered.filter(
-        (p) => p.Category?.toLowerCase() === filteredCategory.toLowerCase()
-      );
-    }
-
-    if (q) {
-      filtered = filtered.filter(
-        (p) =>
-          p.title.toLowerCase().includes(q) ||
-          (p.description || "").toLowerCase().includes(q)
-      );
-    }
-
-    return filtered;
-  }, [projects, deferredSearch, filteredCategory, filter]);
-
-  const categories = useMemo(() => {
-    const counts: Record<string, { name: string; count: number }> = {};
-    projects.forEach((p) => {
-      if (!p.Category) return;
-      const clean = p.Category.trim().toLowerCase();
-      if (!counts[clean]) {
-        counts[clean] = {
-          name:
-            p.Category.trim().charAt(0).toUpperCase() +
-            p.Category.trim().slice(1).toLowerCase(),
-          count: 0,
-        };
-      }
-      counts[clean].count += 1;
-    });
-    return Object.values(counts);
-  }, [projects]);
+  // Update query params helper
+  const updateQuery = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set(key, value);
+    else params.delete(key);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
 
   return (
     <div className="flex flex-col md:flex-row lg:flex-row lg:items-center lg:justify-between w-full gap-2 pt-2 shadow-sm">
+      {/* Search */}
       <div className="relative flex items-center w-full sm:max-w-sm md:max-w-md">
         <Search className="absolute left-3 text-gray-400" size={18} />
         <Input
           type="text"
           placeholder="Search projects..."
-          value={deferredSearch}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              updateQuery("q", searchInput.trim());
+              setSearchInput("");
+            }
+          }}
           className="pl-10 pr-14 py-2 rounded-lg border text-sm"
         />
         <kbd className="absolute right-3 text-[12px] px-1.5 py-0.5 rounded">
@@ -99,11 +53,9 @@ export default function HomeHeader() {
         </kbd>
       </div>
 
+      {/* Filter */}
       <div className="flex items-center justify-start lg:justify-end gap-2 w-full lg:w-auto">
-        <Select
-          defaultValue="all"
-          onValueChange={(v) => setFilter(v as string)}
-        >
+        <Select onValueChange={(v) => updateQuery("filter", v)}>
           <SelectTrigger className="min-w-[125px]">
             <SelectValue placeholder="All Projects" />
           </SelectTrigger>
@@ -114,30 +66,7 @@ export default function HomeHeader() {
           </SelectContent>
         </Select>
 
-        <Select
-          defaultValue="all"
-          onValueChange={(v) => setFilteredCategory(v === "all" ? "" : v)}
-        >
-          <SelectTrigger className="min-w-[125px]">
-            <SelectValue placeholder="Select Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Categories</SelectItem>
-            {categories.map((c) => (
-              <SelectItem
-                key={c.name}
-                value={c.name}
-                className="flex items-center justify-between gap-3 px-2 py-1"
-              >
-                <span className="font-medium">{c.name}</span>
-                <span className="text-muted-foreground text-sm">
-                  ({c.count})
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
+        {/* Add Project */}
         <Dialog>
           <DialogTrigger asChild>
             <Button

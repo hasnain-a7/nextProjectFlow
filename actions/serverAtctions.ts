@@ -89,6 +89,43 @@ export async function fetchUserProjects(userId: string) {
     return [];
   }
 }
+export async function fetchProjectById(projectId: string) {
+  try {
+    await connectDB();
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      throw new Error("Invalid project ID");
+    }
+
+    const project = await Project.findById(projectId).lean();
+
+    if (!project) return null;
+
+    // Convert Mongoose document to plain JS object with string IDs
+    const plainProject = {
+      ...project,
+      _id: project._id.toString(),
+      userId: project.userId?.toString(),
+      assignedUsers: project.assignedUsers?.map((id) => id.toString()) || [],
+      tasks:
+        project.tasks?.map((t: any) => ({
+          ...t,
+          _id: t._id.toString(),
+          createdAt: t.createdAt?.toISOString(),
+          updatedAt: t.updatedAt?.toISOString(),
+        })) || [],
+      dueDate: project.dueDate?.toISOString() || null,
+      createdAt: project.createdAt?.toISOString(),
+      updatedAt: project.updatedAt?.toISOString(),
+      attachments: project.attachments || [],
+    };
+
+    return plainProject;
+  } catch (err) {
+    console.error("❌ Error fetching project:", err);
+    return null;
+  }
+}
 
 export async function addProject(data: any) {
   try {
