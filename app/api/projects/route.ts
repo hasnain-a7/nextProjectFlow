@@ -4,26 +4,6 @@ import Project from "@/models/Project";
 import { getAuthUserId } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
-export async function GET() {
-  try {
-    await connectDB();
-    const userId = await getAuthUserId();
-
-    const owned = await Project.find({ userId }).lean();
-    const assigned = await Project.find({ assignedUsers: userId }).lean();
-
-    const combined = [
-      ...owned,
-      ...assigned.filter(
-        (p) => !owned.some((op) => op._id.toString() === p._id.toString())
-      ),
-    ];
-
-    return NextResponse.json(combined);
-  } catch {
-    return NextResponse.json([], { status: 500 });
-  }
-}
 export async function POST(req: Request) {
   try {
     await connectDB();

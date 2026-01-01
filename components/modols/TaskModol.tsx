@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useProjectContext, Task } from "@/app/context/projectContext";
+import { Task } from "@/types/types";
 import {
   DialogContent,
   DialogHeader,
@@ -19,32 +19,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import DatePicker from "../DatePicker";
-import { useParams } from "next/navigation";
 import { Separator } from "../ui/separator";
 import Image from "next/image";
 import EmojiInput from "../EmojiInput";
 
-export interface TaskFormData {
-  title: string;
-  todo: string;
-  status: string;
-  attachments: string[];
-  dueDate: string;
-  createdAt?: string;
-  todoEmoji?: string;
-}
-
+import { useRouter } from "next/navigation";
 interface TodoModelProps {
   projectId?: string;
   taskToEdit?: Task;
 }
 
 const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
-  const { addTaskToProject, updateTaskInProject } = useProjectContext();
-  const { projectid } = useParams();
-
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<TaskFormData>({
+  const [formData, setFormData] = useState<Task>({
     title: "",
     todo: "",
     status: "backlog",
@@ -54,7 +41,7 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
     todoEmoji: "",
   });
 
-  // ✅ Set task data only when editing
+  const router = useRouter();
   useEffect(() => {
     if (taskToEdit) {
       setFormData({
@@ -79,18 +66,12 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
     }
   }, [taskToEdit]);
 
-  const handleInputChange = useCallback(
-    (field: keyof TaskFormData, value: string) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    },
-    []
-  );
+  const handleInputChange = useCallback((field: keyof Task, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }, []);
 
-  const normalizedProjectId = Array.isArray(projectid)
-    ? projectid[0]
-    : projectid;
-
-  const handleSubmit = useCallback(async () => {
+  const normalizedProjectId = projectId;
+  const handleSubmit = async () => {
     if (!formData.title.trim()) return;
     setLoading(true);
 
@@ -98,13 +79,32 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
       const activeProjectId = projectId || normalizedProjectId;
       if (!activeProjectId) throw new Error("❌ No project ID found");
 
-      if (taskToEdit?.id) {
-        await updateTaskInProject(activeProjectId, taskToEdit.id, formData);
+      let res: Response;
+
+      if (taskToEdit?._id) {
+        // UPDATE TASK
+        res = await fetch(`/api/tasks/${activeProjectId}/${taskToEdit._id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
       } else {
-        await addTaskToProject(activeProjectId, formData);
+        // ADD TASK
+        res = await fetch(`/api/tasks/${activeProjectId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
       }
 
-      // Reset form after success
+      // Always check for empty response
+      const text = await res.text();
+      if (!text) throw new Error("Empty response from server");
+      const result = JSON.parse(text);
+
+      if (!res.ok) throw new Error(result.error || "Failed");
+
+      // Reset form
       setFormData({
         title: "",
         todo: "",
@@ -112,20 +112,15 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
         attachments: [],
         dueDate: "",
         createdAt: "",
+        todoEmoji: "",
       });
+      router.refresh();
     } catch (err) {
       console.error("❌ Error saving task:", err);
     } finally {
       setLoading(false);
     }
-  }, [
-    addTaskToProject,
-    updateTaskInProject,
-    projectId,
-    normalizedProjectId,
-    formData,
-    taskToEdit,
-  ]);
+  };
 
   const statusOptions = useMemo(
     () => [

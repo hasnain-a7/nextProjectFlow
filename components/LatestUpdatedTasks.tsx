@@ -6,19 +6,15 @@ import TaskDetailModal from "./modols/TrelloModol";
 import { Badge } from "./ui/badge";
 import { Edit, Info } from "lucide-react";
 import { Project, Task } from "@/types/types";
+import { getAuthUserId } from "@/lib/auth";
+import { fetchUserProjects } from "@/actions/serverAtctions";
 
 const LatestUpdatedTasks = async () => {
-  const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+  const userId = await getAuthUserId();
+  let projects: Project[] = [];
 
-  let projects = [];
+  projects = await fetchUserProjects(userId);
 
-  try {
-    const res = await fetch(`${baseUrl}/api/projects`, { cache: "no-store" });
-    projects = await res.json();
-  } catch (err) {
-    console.error("Failed to fetch projects:", err);
-  }
-  // Extract all tasks with project info
   const allTasks = projects.flatMap((project: Project) =>
     (project.Tasks || []).map((task: Task) => ({
       ...task,

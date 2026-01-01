@@ -3,9 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, Mail, MapPin, Briefcase } from "lucide-react";
-import { useUserContextId } from "@/app/context/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { User } from "@/app/context/projectContext";
+import { User } from "@/types/types";
 import Image from "next/image";
 
 interface ProfileHeaderProps {
@@ -13,8 +12,6 @@ interface ProfileHeaderProps {
 }
 
 function ProfileHeaderComponent({ user }: ProfileHeaderProps) {
-  const { userContextId } = useUserContextId();
-
   return (
     <Card className="overflow-hidden relative">
       <CardContent className="relative p-0">
@@ -80,8 +77,7 @@ function ProfileHeaderComponent({ user }: ProfileHeaderProps) {
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-foreground/80">
               <span className="font-mono text-foreground/80">
-                <span className="text-muted-foreground">UID:</span>{" "}
-                {user?.id || userContextId}
+                <span className="text-muted-foreground">UID:</span> {user?._id}
               </span>
               {user?.email && (
                 <div className="flex items-center gap-1">

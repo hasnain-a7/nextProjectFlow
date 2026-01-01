@@ -18,11 +18,9 @@ export default function AssignProjectsClient({
 }) {
   const [search, setSearch] = useState("");
   const router = useRouter();
-
   const filteredProjects = initialProjects.filter((p) =>
     p.title.toLowerCase().includes(search.toLowerCase())
   );
-
   const handleProjectClick = (id: string) => router.push(`/projects/${id}`);
 
   return (

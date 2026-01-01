@@ -218,7 +218,7 @@ const TaskAccordionTable: React.FC<TaskAccordionTableProps> = async ({
 
                   {section.tasks.map((task) => (
                     <div
-                      key={task.id}
+                      key={task._id}
                       className="border-b border-border/60 last:border-0 py-2 hover:bg-accent/30 transition-colors"
                     >
                       <div className="hidden sm:grid grid-cols-12 mt-1  items-start text-sm px-2 ">

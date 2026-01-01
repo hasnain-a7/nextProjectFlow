@@ -23,7 +23,7 @@ interface DashboardClientProps {
 
 export default function HomeClient({ initialProjects }: DashboardClientProps) {
   return (
-    <div className="flex flex-col lg:flex-row h-full w-full gap-2 mt-2">
+    <div className="flex flex-col lg:flex-row h-full w-full gap-2 mt-1">
       {/* LEFT SECTION */}
       <div className="flex-1 min-w-0">
         <div className="flex flex-col gap-2">

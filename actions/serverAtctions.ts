@@ -5,7 +5,6 @@ import User from "@/models/User";
 import Project from "@/models/Project";
 import mongoose, { UpdateQuery } from "mongoose";
 
-// ----------------- User -----------------
 export async function fetchUserData(userId: string) {
   try {
     await connectDB();
@@ -71,6 +70,19 @@ export async function fetchUserProjects(userId: string) {
       _id: p._id.toString(),
       userId: p.userId?.toString(),
       assignedUsers: p.assignedUsers?.map((id) => id.toString()) || [],
+
+      // FIX: Map through attachments to convert buffers
+      attachments:
+        p.attachments?.map((attr: any) => ({
+          ...attr,
+          _id: attr._id?.toString(),
+
+          buffer:
+            attr.buffer instanceof Uint8Array
+              ? Buffer.from(attr.buffer).toString("base64")
+              : attr.buffer,
+        })) || [],
+
       tasks:
         p.tasks?.map((t: any) => ({
           ...t,
@@ -78,6 +90,7 @@ export async function fetchUserProjects(userId: string) {
           createdAt: t.createdAt?.toISOString(),
           updatedAt: t.updatedAt?.toISOString(),
         })) || [],
+
       dueDate: p.dueDate?.toISOString() || null,
       createdAt: p.createdAt?.toISOString(),
       updatedAt: p.updatedAt?.toISOString(),
@@ -93,31 +106,38 @@ export async function fetchProjectById(projectId: string) {
   try {
     await connectDB();
 
-    if (!mongoose.Types.ObjectId.isValid(projectId)) {
-      throw new Error("Invalid project ID");
-    }
-
-    const project = await Project.findById(projectId).lean();
+    // Use lean() to get plain JS object
+    const project = await Project.findById(projectId)
+      .populate("tasks") // populate tasks if they are ObjectIds
+      .lean();
 
     if (!project) return null;
 
-    // Convert Mongoose document to plain JS object with string IDs
+    // Serialize the project and tasks
     const plainProject = {
       ...project,
       _id: project._id.toString(),
       userId: project.userId?.toString(),
-      assignedUsers: project.assignedUsers?.map((id) => id.toString()) || [],
-      tasks:
-        project.tasks?.map((t: any) => ({
-          ...t,
-          _id: t._id.toString(),
-          createdAt: t.createdAt?.toISOString(),
-          updatedAt: t.updatedAt?.toISOString(),
-        })) || [],
+      assignedUsers:
+        project.assignedUsers?.map((id: any) => id.toString()) || [],
       dueDate: project.dueDate?.toISOString() || null,
       createdAt: project.createdAt?.toISOString(),
       updatedAt: project.updatedAt?.toISOString(),
       attachments: project.attachments || [],
+      tasks:
+        project.tasks?.map((t: any) => ({
+          ...t,
+          _id: t._id.toString(),
+          projectId: t.projectId?.toString(),
+          userId: t.userId?.toString(),
+          createdAt: t.createdAt?.toISOString(),
+          updatedAt: t.updatedAt?.toISOString(),
+          dueDate: t.dueDate?.toISOString() || null,
+          attachments:
+            t.attachments?.map((a: any) =>
+              typeof a === "string" ? a : Buffer.from(a).toString("base64")
+            ) || [],
+        })) || [],
     };
 
     return plainProject;
@@ -195,7 +215,7 @@ export async function addTaskToProject(projectId: string, task: any) {
     const project = await Project.findById(projectId);
     if (!project) throw new Error("Project not found");
 
-    project.tasks.push({ ...task, createdAt: new Date() });
+    project.tasks.push({ ...task });
     await project.save();
 
     return project.tasks[project.tasks.length - 1]._id.toString();
@@ -218,7 +238,7 @@ export async function updateTaskInProject(
     const task = project.tasks.id(taskId);
     if (!task) throw new Error("Task not found");
 
-    Object.assign(task, updatedData, { updatedAt: new Date() });
+    Object.assign(task, updatedData);
     await project.save();
 
     return true;

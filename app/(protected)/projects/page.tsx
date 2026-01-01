@@ -2,6 +2,7 @@ import { getAuthUserId } from "@/lib/auth";
 import AssignProjectsClient from "./_components/projectsclient";
 import { fetchUserProjects } from "@/actions/serverAtctions";
 
+export const revalidate = 0; // never cache
 export default async function AssignProjectsPage() {
   const userId = await getAuthUserId();
 

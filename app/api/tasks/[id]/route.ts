@@ -1,22 +1,37 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Project from "@/models/Project";
-
-export async function POST(req: Request, { params }: any) {
+import Task from "@/models/Tasks";
+import { revalidatePath } from "next/cache";
+export async function POST(req: Request, ctx: any) {
   try {
+    const { id } = await ctx.params; // unwrap the params
     await connectDB();
+
     const data = await req.json();
 
-    const project = await Project.findById(params.projectId);
+    // 1️⃣ Create the task in Task collection
+    const task = await Task.create({
+      ...data,
+      createdAt: new Date(),
+      projectId: id,
+    });
+
+    const project = await Project.findById(id);
     if (!project) throw new Error("Project not found");
 
-    project.Tasks.push({ ...data, createdAt: new Date() });
+    project.tasks.push(task._id);
     await project.save();
-
+    revalidatePath(`/projects/${id}`);
     return NextResponse.json({
-      id: project.Tasks[project.Tasks.length - 1]._id.toString(),
+      id: task._id.toString(),
+      success: true,
     });
-  } catch {
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  } catch (error: any) {
+    console.error("ADD TASK ERROR:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed" },
+      { status: 500 }
+    );
   }
 }
