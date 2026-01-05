@@ -1,6 +1,5 @@
-import { fetchUserProjects } from "@/actions/serverAtctions";
 import { getAuthUserId } from "@/lib/auth";
-import { Project } from "@/types/types";
+import { IProject } from "@/types/types";
 import Projectlist from "./Projectlist";
 
 export const revalidate = 0; // never cache
@@ -17,10 +16,24 @@ export async function StreamingProjectsGrid({
 
   // Get logged-in user
   const userId = await getAuthUserId();
-  let projects: Project[] = [];
+  let projects: IProject[] = [];
 
-  if (userId) {
-    projects = await fetchUserProjects(userId);
+  try {
+    // Fetch projects from your API
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects?userId=${userId}`,
+      { cache: "no-store" } // ensures always fresh data
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      projects = data.data;
+    } else {
+      console.error("API returned error:", data.message);
+    }
+  } catch (err) {
+    console.error("Failed to fetch projects:", err);
   }
 
   // Filter and sort projects

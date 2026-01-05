@@ -12,13 +12,13 @@ import {
   StreamingProjectsGrid,
 } from "@/components/ProjectsGrid";
 import { LatestProjectSkeleton } from "@/components/Skeletons";
-import { Project } from "@/types/types";
+import { IProject } from "@/types/types";
 import HomeHeader from "./HomeHeader";
 
 interface DashboardClientProps {
-  initialProjects: Project;
-  latestProject: Project;
-  lastUpdatedProject: Project;
+  initialProjects: IProject;
+  latestProject: IProject;
+  lastUpdatedProject: IProject;
 }
 
 export default function HomeClient({ initialProjects }: DashboardClientProps) {

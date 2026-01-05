@@ -1,7 +1,7 @@
 export interface User {
   _id?: string;
   email: string;
-  fullname: string;
+  fullname?: string;
   location?: string | null;
   occupation?: string | null;
   organization?: string | null;
@@ -12,7 +12,7 @@ export interface User {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface Task {
+export interface ITask {
   _id?: string;
   title: string;
   todo: string;
@@ -25,7 +25,7 @@ export interface Task {
   projectId?: string;
   todoEmoji?: string;
 }
-export interface Project {
+export interface IProject {
   _id?: string;
   title: string;
   Category?: string;
@@ -39,5 +39,5 @@ export interface Project {
   status?: string;
   assignedUsers?: string[];
   projectEmoji?: string;
-  Tasks?: Task[];
+  Tasks?: ITask[];
 }

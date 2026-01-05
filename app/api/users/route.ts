@@ -11,7 +11,7 @@ export async function GET() {
     const user = await User.findById(userId).lean();
     return NextResponse.json(user);
   } catch (e) {
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json({ error: "Failed", e }, { status: 500 });
   }
 }
 

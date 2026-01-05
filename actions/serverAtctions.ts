@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import Project from "@/models/Project";
 import mongoose, { UpdateQuery } from "mongoose";
+import { IProject, ITask, User as Iuser } from "@/types/types";
 
 export async function fetchUserData(userId: string) {
   try {
@@ -16,7 +17,7 @@ export async function fetchUserData(userId: string) {
   }
 }
 
-export async function updateUserData(data: any) {
+export async function updateUserData(data: Iuser) {
   try {
     await connectDB();
     if (!data._id) throw new Error("No user ID provided");
@@ -46,9 +47,11 @@ export async function deleteUserData(userId: string) {
 }
 
 // ----------------- Projects -----------------
+// ----------------- Projects -----------------
 export async function fetchUserProjects(userId: string) {
   try {
     await connectDB();
+
     const objectId = new mongoose.Types.ObjectId(userId);
 
     const ownedProjects = await Project.find({ userId: objectId }).lean();
@@ -64,36 +67,53 @@ export async function fetchUserProjects(userId: string) {
       ),
     ];
 
-    // Convert Mongoose objects to plain JS objects with string IDs
-    const plainProjects = combinedProjects.map((p) => ({
+    const plainProjects = combinedProjects.map((p: IProject) => ({
       ...p,
-      _id: p._id.toString(),
+
+      _id: p._id?.toString(),
+
       userId: p.userId?.toString(),
-      assignedUsers: p.assignedUsers?.map((id) => id.toString()) || [],
 
-      // FIX: Map through attachments to convert buffers
+      assignedUsers: p.assignedUsers?.map((id: any) => id?.toString()) || [],
+
+      // ---- Attachments ----
       attachments:
-        p.attachments?.map((attr: any) => ({
-          ...attr,
-          _id: attr._id?.toString(),
-
+        p.attachments?.map((a: any) => ({
+          ...a,
+          _id: a?._id?.toString(),
           buffer:
-            attr.buffer instanceof Uint8Array
-              ? Buffer.from(attr.buffer).toString("base64")
-              : attr.buffer,
+            a?.buffer instanceof Uint8Array
+              ? Buffer.from(a.buffer).toString("base64")
+              : typeof a?.buffer === "string"
+              ? a.buffer
+              : null,
         })) || [],
 
+      // ---- Tasks ----
       tasks:
         p.tasks?.map((t: any) => ({
           ...t,
-          _id: t._id.toString(),
-          createdAt: t.createdAt?.toISOString(),
-          updatedAt: t.updatedAt?.toISOString(),
+          _id: t?._id?.toString(),
+          projectId: t?.projectId?.toString(),
+          userId: t?.userId?.toString(),
+
+          createdAt: t?.createdAt?.toISOString?.() || null,
+          updatedAt: t?.updatedAt?.toISOString?.() || null,
+          dueDate: t?.dueDate?.toISOString?.() || null,
+
+          attachments:
+            t?.attachments?.map((a: any) =>
+              a?.buffer instanceof Uint8Array
+                ? Buffer.from(a.buffer).toString("base64")
+                : typeof a === "string"
+                ? a
+                : a
+            ) || [],
         })) || [],
 
-      dueDate: p.dueDate?.toISOString() || null,
-      createdAt: p.createdAt?.toISOString(),
-      updatedAt: p.updatedAt?.toISOString(),
+      dueDate: p?.dueDate?.toISOString?.() || null,
+      createdAt: p?.createdAt?.toISOString?.() || null,
+      updatedAt: p?.updatedAt?.toISOString?.() || null,
     }));
 
     return plainProjects;
@@ -102,42 +122,60 @@ export async function fetchUserProjects(userId: string) {
     return [];
   }
 }
+
 export async function fetchProjectById(projectId: string) {
   try {
     await connectDB();
 
-    // Use lean() to get plain JS object
-    const project = await Project.findById(projectId)
-      .populate("tasks") // populate tasks if they are ObjectIds
-      .lean();
+    const objectId = new mongoose.Types.ObjectId(projectId);
+
+    const project = await Project.findById(objectId).lean();
 
     if (!project) return null;
 
-    // Serialize the project and tasks
-    const plainProject = {
+    const plainProject: IProject = {
       ...project,
       _id: project._id.toString(),
       userId: project.userId?.toString(),
+
       assignedUsers:
         project.assignedUsers?.map((id: any) => id.toString()) || [],
-      dueDate: project.dueDate?.toISOString() || null,
-      createdAt: project.createdAt?.toISOString(),
-      updatedAt: project.updatedAt?.toISOString(),
-      attachments: project.attachments || [],
+
+      // ✅ FIX: convert attachments + buffer safely
+      attachments:
+        project.attachments?.map((attr: any) => ({
+          ...attr,
+          _id: attr._id?.toString(),
+          buffer:
+            attr?.buffer instanceof Uint8Array
+              ? Buffer.from(attr.buffer).toString("base64")
+              : attr?.buffer,
+        })) || [],
+
+      // ✅ Ensure tasks are serializable too
       tasks:
         project.tasks?.map((t: any) => ({
           ...t,
-          _id: t._id.toString(),
+          _id: t._id?.toString(),
           projectId: t.projectId?.toString(),
           userId: t.userId?.toString(),
-          createdAt: t.createdAt?.toISOString(),
-          updatedAt: t.updatedAt?.toISOString(),
-          dueDate: t.dueDate?.toISOString() || null,
+          createdAt: t.createdAt?.toString(),
+          updatedAt: t.updatedAt?.toString(),
+          dueDate: t.dueDate?.toString(),
+
           attachments:
             t.attachments?.map((a: any) =>
-              typeof a === "string" ? a : Buffer.from(a).toString("base64")
+              a?.buffer instanceof Uint8Array
+                ? Buffer.from(a.buffer).toString("base64")
+                : typeof a === "string"
+                ? a
+                : a
             ) || [],
         })) || [],
+
+      dueDate: project.dueDate?.toISOString() || null,
+      createdAt: project.createdAt?.toISOString(),
+      updatedAt: project.updatedAt?.toISOString(),
     };
 
     return plainProject;
@@ -147,7 +185,7 @@ export async function fetchProjectById(projectId: string) {
   }
 }
 
-export async function addProject(data: any) {
+export async function addProject(data: IProject) {
   try {
     await connectDB();
 
@@ -167,7 +205,7 @@ export async function addProject(data: any) {
 
 export async function updateProject(
   projectId: string,
-  data: any,
+  data: IProject,
   assignedUsers?: string[],
   deletedUsers?: string[]
 ) {
@@ -209,7 +247,7 @@ export async function deleteProject(projectId: string) {
 }
 
 // ----------------- Tasks -----------------
-export async function addTaskToProject(projectId: string, task: any) {
+export async function addTaskToProject(projectId: string, task: ITask) {
   try {
     await connectDB();
     const project = await Project.findById(projectId);
@@ -228,7 +266,7 @@ export async function addTaskToProject(projectId: string, task: any) {
 export async function updateTaskInProject(
   projectId: string,
   taskId: string,
-  updatedData: any
+  updatedData: ITasks
 ) {
   try {
     await connectDB();

@@ -1,35 +1,45 @@
-import { fetchUserProjects } from "@/actions/serverAtctions";
 import HomeClient from "./_components/HomeClient";
 import { StatsSection } from "./_components/StatsSection";
 import { getAuthUserId } from "@/lib/auth";
-import { Project } from "@/types/types";
+import { IProject } from "@/types/types";
+
 export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const userId = await getAuthUserId();
 
-  let projects = [];
+  let projects: IProject[] = [];
 
   try {
-    projects = await fetchUserProjects(userId);
+    // Fetch projects from your API
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects?userId=${userId}`,
+      { cache: "no-store" } // ensures always fresh data
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      projects = data.data;
+    } else {
+      console.error("API returned error:", data.message);
+    }
   } catch (err) {
     console.error("Failed to fetch projects:", err);
   }
 
-  // Calculate static stats safely
+  // Calculate stats
   const stats = {
     totalProjects: projects.length,
-    assignedProjects: projects.filter((p: Project) => p.assignedUsers?.length)
-      .length,
-    activeProjects: projects.filter((p: Project) => p.status === "active")
-      .length,
-    totalTasks: projects.reduce(
-      (sum: number, p: Project) => sum + (p.Tasks?.length || 0),
-      0
-    ),
+    assignedProjects: projects.filter((p) => p.assignedUsers?.length).length,
+    activeProjects: projects.filter((p) => p.status === "active").length,
+    totalTasks: projects.reduce((sum, p) => sum + (p.Tasks?.length || 0), 0),
   };
 
   const latestProject = [...projects].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a, b) =>
+      new Date(b.createdAt ?? "").getTime() -
+      new Date(a.createdAt ?? "").getTime()
   )[0];
 
   const lastUpdatedProject = [...projects]

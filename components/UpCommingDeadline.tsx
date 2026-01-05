@@ -4,8 +4,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { redirect } from "next/navigation";
 import { CalendarDays, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Project } from "@/types/types";
-export function UpcomingDeadlines({ projects }: { projects: Project }) {
+import { IProject } from "@/types/types";
+export function UpcomingDeadlines({ projects }: { projects: IProject[] }) {
   const sorted = [...projects]
     .filter((p) => p.dueDate)
     .sort(

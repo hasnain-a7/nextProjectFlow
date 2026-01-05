@@ -3,44 +3,57 @@ import { connectDB } from "@/lib/db";
 import Project from "@/models/Project";
 import Task from "@/models/Tasks";
 import { revalidatePath } from "next/cache";
-export async function PATCH(req: Request, ctx: any) {
+import { ITask } from "@/types/types";
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string; taskId: string } }
+) {
   try {
     await connectDB();
 
-    const projectId = ctx.params.id; // your project ID in URL
-    const taskId = ctx.params.taskId; // your task ID in URL
+    const { id: projectId, taskId } = params;
 
-    if (!taskId) throw new Error("❌ No task ID provided");
+    if (!taskId) {
+      return NextResponse.json(
+        { success: false, message: "No task ID provided" },
+        { status: 400 }
+      );
+    }
 
     const data = await req.json();
+    if (!data || Object.keys(data).length === 0) {
+      return NextResponse.json(
+        { success: false, message: "No data provided to update" },
+        { status: 400 }
+      );
+    }
 
-    // Find the task by ID
+    // Find task and update all fields except _id and projectId
     const task = await Task.findById(taskId);
-    if (!task) throw new Error("❌ Task not found");
+    if (!task) {
+      return NextResponse.json(
+        { success: false, message: "Task not found" },
+        { status: 404 }
+      );
+    }
 
-    // Update only allowed fields to avoid overwriting _id or projectId
-    const allowedFields = [
-      "title",
-      "todo",
-      "status",
-      "attachments",
-      "dueDate",
-      "todoEmoji",
-    ];
-    allowedFields.forEach((field) => {
-      if (field in data) task[field] = data[field];
+    Object.keys(data).forEach((key) => {
+      if (key !== "_id" && key !== "projectId") {
+        task[key] = data[key];
+      }
     });
-    task.updatedAt = new Date();
 
+    task.updatedAt = new Date();
     await task.save();
 
-    // Revalidate the project page to reflect new task data
-    revalidatePath(`/projects/${projectId}`);
-
-    return NextResponse.json({ success: true, id: task._id.toString() });
+    return NextResponse.json({ success: true, data: task });
   } catch (err: any) {
-    console.error("UPDATE TASK ERROR:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("PATCH TASK ERROR:", err);
+    return NextResponse.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    );
   }
 }
 

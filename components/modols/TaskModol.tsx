@@ -82,6 +82,8 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
       let res: Response;
 
       if (taskToEdit?._id) {
+        if (!taskToEdit._id) throw new Error("❌ No task ID found for update");
+
         // UPDATE TASK
         res = await fetch(`/api/tasks/${activeProjectId}/${taskToEdit._id}`, {
           method: "PATCH",
@@ -97,12 +99,12 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
         });
       }
 
-      // Always check for empty response
+      // Parse response safely
       const text = await res.text();
       if (!text) throw new Error("Empty response from server");
       const result = JSON.parse(text);
 
-      if (!res.ok) throw new Error(result.error || "Failed");
+      if (!res.ok) throw new Error(result.error || result.message || "Failed");
 
       // Reset form
       setFormData({
@@ -114,7 +116,8 @@ const TaskModel: React.FC<TodoModelProps> = ({ projectId, taskToEdit }) => {
         createdAt: "",
         todoEmoji: "",
       });
-      router.refresh();
+
+      router.refresh(); // Refresh the page or re-fetch data
     } catch (err) {
       console.error("❌ Error saving task:", err);
     } finally {
