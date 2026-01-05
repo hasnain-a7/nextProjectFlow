@@ -1,3 +1,5 @@
+"use client"; // at the top of TaskAccordionTable.tsx
+
 import {
   Accordion,
   AccordionContent,
@@ -5,8 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Edit, FileText, Info, Trash2 } from "lucide-react";
-
-import { useProjectContext, Task } from "@/app/context/projectContext";
+import { Task } from "@/types/types";
 import TaskModol from "./modols/TaskModol";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import TaskDetailModal from "./modols/TrelloModol";
@@ -18,12 +19,12 @@ const TaskDetailsAccordion = ({
   task: Task & { dueDate: string };
   projectid: string;
 }) => {
-  const { deleteTaskFromProject } = useProjectContext();
-
   const handleDelChange = async (taskId: string) => {
     try {
       if (window.confirm("Are you sure you want to delete this task?")) {
-        await deleteTaskFromProject(projectid, taskId || "");
+        await fetch(`/api/tasks/${projectid}/${taskId}`, {
+          method: "DELETE",
+        });
       }
     } catch (error) {
       console.log("err: ", error);
@@ -34,7 +35,7 @@ const TaskDetailsAccordion = ({
     <>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem
-          value={`task-${task.id}`}
+          value={`task-${task._id}`}
           className="border-b last:border-b-0  cursor-pointer"
         >
           <AccordionTrigger className="hover:no-underline md:px-3 py-0">
@@ -48,12 +49,7 @@ const TaskDetailsAccordion = ({
                 {task.title?.split(" ").slice(0, 4).join(" ")}
                 <div className=" flex gap-2">
                   <Dialog>
-                    <DialogTrigger
-                      asChild
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                    >
+                    <DialogTrigger asChild>
                       <Info
                         size={16}
                         className="text-muted-foreground hover:text-primary cursor-pointer"
@@ -65,9 +61,6 @@ const TaskDetailsAccordion = ({
                     <DialogTrigger asChild>
                       <Edit
                         size={16}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
                         className="text-muted-foreground hover:text-primary cursor-pointer"
                       />
                     </DialogTrigger>
@@ -79,7 +72,7 @@ const TaskDetailsAccordion = ({
                     className=" text-muted-foreground hover:text-primary cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelChange(task.id || "");
+                      handleDelChange(task._id || "");
                     }}
                   />
                 </div>

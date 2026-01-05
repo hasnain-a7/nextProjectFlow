@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardHeader,
@@ -18,21 +19,21 @@ interface Task {
   status: string;
 }
 
-interface Project {
-  id?: string;
+export interface Project {
+  _id?: string;
   title: string;
+  Category?: string;
   description: string;
   url?: string;
-  createdAt: string;
-  Category: string;
-  dueDate?: string;
-  label?: string;
-  priority?: string;
+  userId?: string;
+  createdAt?: string;
+  updatedAt?: string;
   attachments?: string[];
+  dueDate?: string;
+  status?: string;
   assignedUsers?: string[];
-  comments?: number;
-  members?: { avatar: string; name: string }[];
   projectEmoji?: string;
+  Tasks?: Task[];
 }
 
 interface ProjectCardProps {
@@ -81,8 +82,8 @@ export const ProjectCard = ({
   const percentage = calculateProgress(completed, total);
 
   const handleCardClick = () => {
-    if (projectToShow.id) {
-      onClick?.(projectToShow.id);
+    if (projectToShow._id) {
+      onClick?.(projectToShow._id);
     }
   };
 

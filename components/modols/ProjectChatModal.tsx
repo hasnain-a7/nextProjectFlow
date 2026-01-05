@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, useRef, useMemo } from "react";
 import {
   doc,
@@ -13,7 +14,6 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db } from "@/app/config/Firebase";
-import { useUserContextId } from "@/app/context/AuthContext";
 import {
   Dialog,
   DialogTrigger,
@@ -33,7 +33,7 @@ import { MessageCircle, Loader2 } from "lucide-react";
 import Loader from "../Loader";
 
 export default function ProjectChatModal({ projectId }: { projectId: string }) {
-  const { userContextId } = useUserContextId();
+  const userContextId = "1234";
   const { userData } = useProjectContext();
   const [messages, setMessages] = useState<any[]>([]);
   const [message, setMessage] = useState("");

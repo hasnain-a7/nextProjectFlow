@@ -15,11 +15,8 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { useProjectContext } from "@/app/context/projectContext";
-import { useState, memo } from "react";
-import type { User } from "@/app/context/projectContext";
-import { useUserContextId } from "@/app/context/AuthContext";
-import { ChangePasswordDialog } from "@/components/ChangePassword";
+import { useState, memo, useEffect } from "react";
+import { User } from "@/types/types";
 
 // HELPER: Moved outside component to prevent re-creation on every render
 const toBase64 = (file: File) =>
@@ -31,11 +28,9 @@ const toBase64 = (file: File) =>
   });
 
 export default function ProfileContent() {
-  const { userData, updateUserData, deleteUserData } = useProjectContext();
-  const { userContextId, deleteFirebaseAccount, logout } = useUserContextId();
-
+  const [userData, setuserData] = useState<User>();
   const [currentUser, setCurrentUser] = useState<User>({
-    id: userData?.id || userContextId || "",
+    _id: userData?._id || "",
     fullname: userData?.fullname || "",
     email: userData?.email || "",
     location: userData?.location || "",
@@ -46,13 +41,34 @@ export default function ProfileContent() {
     avatar: userData?.avatar || "",
     coverImage: userData?.coverImage,
   });
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch("/api/users", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setuserData(data);
+    } catch (err) {
+      console.error("❌ Failed to fetch user data:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     try {
       setSaving(true);
-      await updateUserData(currentUser);
+      // await updateUserData(currentUser);
       console.log("✅ Profile updated successfully!");
     } catch (error) {
       console.error("❌ Failed to update profile:", error);
@@ -68,9 +84,9 @@ export default function ProfileContent() {
         "Are you sure you want to delete your account? This action is irreversible."
       );
       if (!confirmDelete) return;
-      await deleteFirebaseAccount(currentUser.id);
-      await deleteUserData(currentUser?.id || userContextId!);
-      await logout();
+      // await deleteFirebaseAccount(currentUser.id);
+      // await deleteUserData(currentUser?.id || userContextId!);
+      // await logout();
       console.log("✅ Account deleted successfully!");
     } catch (error) {
       console.error("❌ Failed to delete account:", error);
@@ -113,7 +129,7 @@ export default function ProfileContent() {
           handleSave={handleSave}
           handleFileChange={handleFileChange}
           saving={saving}
-          isActiveOriginal={userData.isActive}
+          isActiveOriginal={userData?.isActive || false}
         />
       </TabsContent>
 
@@ -393,7 +409,7 @@ const SecurityTabContent = memo(() => {
                 Last changed 3 months ago
               </p>
             </div>
-            <ChangePasswordDialog />
+            {/* <ChangePasswordDialog /> */}
           </div>
           <Separator />
           <div className="flex items-center justify-between">

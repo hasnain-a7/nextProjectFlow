@@ -1,41 +1,43 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUserContextId } from "@/app/context/AuthContext";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Loader2, AlertCircle } from "lucide-react";
-
+import { signIn } from "next-auth/react";
 const SignIn: React.FC = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const { login, userContextId } = useUserContextId();
-
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      await login(email, password);
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
+      router.push("/Home");
     } catch (error) {
-      setError((error as Error).message);
+      setError((error as Error).message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (userContextId) router.push("/Home");
-  }, [userContextId, router]);
 
   return (
     <motion.div

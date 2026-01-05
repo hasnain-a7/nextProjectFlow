@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   SidebarFooter as SidebarFooterBase,
   SidebarMenuButton,
@@ -7,9 +7,9 @@ import {
 import { FaSignOutAlt } from "react-icons/fa";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { useRouter } from "next/navigation";
-import { useUserContextId } from "@/app/context/AuthContext";
 
-import { useProjectContext } from "@/app/context/projectContext";
+import { signOut } from "next-auth/react";
+import { User } from "@/types/types";
 
 interface SidebarFooterProps {
   setopen: (open: boolean) => void;
@@ -18,15 +18,35 @@ interface SidebarFooterProps {
 
 const SidebarFooter: React.FC<SidebarFooterProps> = ({ state }) => {
   const navigate = useRouter();
-  const { logout } = useUserContextId();
-  const { userData } = useProjectContext();
+  const [userData, setuserData] = React.useState<User | null>(null);
 
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch("/api/users", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setuserData(data);
+    } catch (err) {
+      console.error("❌ Failed to fetch user data:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
   const handleLogout = async () => {
     const confirmDelete = window.confirm("Do you want to logout?");
     if (!confirmDelete) return;
-    logout();
+    signOut({ callbackUrl: "/Login" });
   };
-
   return (
     <SidebarFooterBase>
       <div className="relative w-full">

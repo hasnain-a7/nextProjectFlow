@@ -1,3 +1,4 @@
+"use client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,17 +13,20 @@ import { EllipsisVertical, Trash2, Trello } from "lucide-react";
 import { FaEdit } from "react-icons/fa";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProjectModol from "./modols/ProjectModol";
-import { useProjectContext, Project } from "@/app/context/projectContext";
-import { useUserContextId } from "@/app/context/AuthContext";
+
 interface ProjectOptionsProps {
   currentProjectDetails: Project;
+  userId: string;
 }
 import { toast } from "sonner";
+import { Project } from "@/types/types";
+import { deleteProject } from "@/actions/serverAtctions";
 
-const ProjectOptions = ({ currentProjectDetails }: ProjectOptionsProps) => {
+const ProjectOptions = ({
+  currentProjectDetails,
+  userId,
+}: ProjectOptionsProps) => {
   const navigate = useRouter();
-  const { deleteProject } = useProjectContext();
-  const { userContextId } = useUserContextId();
 
   const handleTrelloLink = (projectId: string) => {
     navigate.push(`/dashboard/${projectId}`);
@@ -35,7 +39,7 @@ const ProjectOptions = ({ currentProjectDetails }: ProjectOptionsProps) => {
     toast.warning("Project deleted successfully.");
     navigate.push(`/Home`);
   };
-  const isUser = currentProjectDetails?.userId === userContextId;
+  const isUser = currentProjectDetails?.userId === userId || false;
 
   return (
     <DropdownMenu>
@@ -72,7 +76,7 @@ const ProjectOptions = ({ currentProjectDetails }: ProjectOptionsProps) => {
           <ProjectModol ProjectToEdit={currentProjectDetails} />
         </Dialog>
         <DropdownMenuItem
-          onClick={() => handleTrelloLink(currentProjectDetails?.id || "")}
+          onClick={() => handleTrelloLink(currentProjectDetails?._id || "")}
           className="flex items-center gap-2 cursor-pointer"
         >
           <Trello className="h-4 w-4 text-chart-2" />
@@ -81,7 +85,7 @@ const ProjectOptions = ({ currentProjectDetails }: ProjectOptionsProps) => {
 
         {isUser && (
           <DropdownMenuItem
-            onClick={() => handleDelete(currentProjectDetails?.id || "")}
+            onClick={() => handleDelete(currentProjectDetails?._id || "")}
             className="flex items-center gap-2 cursor-pointer focus:bg-red-50 dark:focus:bg-red-950/30"
           >
             <Trash2 className="h-4 w-4  text-destructive" />

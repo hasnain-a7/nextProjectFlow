@@ -19,7 +19,7 @@ export const StatsCard = ({
   return (
     <Card
       className={cn(
-        "rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.01] duration-300",
+        "rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.01] p-0 duration-300",
         color
       )}
     >

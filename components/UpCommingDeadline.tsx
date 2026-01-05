@@ -1,16 +1,11 @@
+"use client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { CalendarDays, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-type Project = {
-  id?: string;
-  title: string;
-  dueDate?: string;
-};
-
-export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
+import { IProject } from "@/types/types";
+export function UpcomingDeadlines({ projects }: { projects: IProject[] }) {
   const sorted = [...projects]
     .filter((p) => p.dueDate)
     .sort(
@@ -19,9 +14,8 @@ export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
     )
     .slice(0, 3);
 
-  const navigate = useRouter();
-  const handleProjectClick = (id: string) => navigate.push(`/projects/${id}`);
-  const handleScheduleClick = () => navigate.push(`/schedule`);
+  const handleProjectClick = (id: string) => redirect(`/projects/${id}`);
+  const handleScheduleClick = () => redirect(`/schedule`);
 
   return (
     <Card className="w-full h-full flex flex-col bg-card hover:border-primary/50 transition-colors duration-300">
@@ -51,8 +45,8 @@ export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
             {sorted.length > 0 ? (
               sorted.map((p) => (
                 <div
-                  key={p.id}
-                  onClick={() => handleProjectClick(p?.id || "")}
+                  key={p._id}
+                  onClick={() => handleProjectClick(p?._id || "")}
                   className="group flex items-center justify-between text-sm px-3 py-2 rounded-md cursor-pointer transition-all duration-200 hover:bg-muted/80 hover:scale-[1.02]"
                 >
                   <div className="flex flex-col gap-0.5 max-w-[70%]">
@@ -60,7 +54,7 @@ export function UpcomingDeadlines({ projects = [] }: { projects: Project[] }) {
                       {p.title}
                     </span>
                     <span className="text-[10px] text-muted-foreground">
-                      Project ID: {p.id?.slice(0, 4)}...
+                      Total Tasks: {p?.Tasks?.length}
                     </span>
                   </div>
 
